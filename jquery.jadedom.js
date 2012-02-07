@@ -72,20 +72,46 @@
 		},
 		get_node_from_string : function ( str ) {
 			if ( typeof cache[ str ] !== 'undefined' ) return cache[ str ].cloneNode( false );
-			if ( str.match( /^\{[^\}]+\}$/ ) ) return document.createTextNode( str.substring( 1, str.length - 1 ) );
-			var tag         = str.match( /^[\w\d]+/i ),
-				classes     = str.match( /\.[\w\d\-\_]+/gi ),
-				id          = str.match( /\#[\w\d\-\_]+/i ) || [],
-				attrs       = str.match( /\[[\"\']?[\w\d\-\_]+[\"\']?\=[\"\']?[^\"\'\]]+[\"\']?\]/gi ) || [],
-				text        = str.match( /\{[^\}]+\}/i ) || [],
-				elem;
+			if ( str.charAt( 0 ) === '|' ) return document.createTextNode( str.replace( /^\|\s*/, '' ) );
+			var start = 0,
+				cur   = 0,
+				char  = false,
+				len   = str.length,
+				attrs = false,
+				text  = false,
+				mode  = 'tag',
+				tag, classes, id;
+			for ( ; cur < len; cur++ ) {
+				char = str.charAt( cur );
+				switch ( char ) {
+					case '(':
+						mode = 'attributes';
+						start = cur;
+						break;
+					case ')':
+						if ( mode !== 'attributes' ) continue;
+						mode = false;
+						attrs = str.substring( start, cur ).replace( /[\(\)]+/g, '' ).split( /[\s\,]+/g );
+						break;
+					case ' ':
+						if ( mode === 'attributes' ) continue;
+						mode = 'text';
+						text = str.substring( cur + 1 );
+						break;
+				}
+				if ( mode === 'text' ) break;
+			}
+			str = str.substring( 0, cur );
+			tag         = str.match( /^[\w\d]+/i );
+			classes     = str.match( /\.[\w\d\-\_]+/gi );
+			id          = str.match( /\#[\w\d\-\_]+/i ) || [];
 			if ( tag && tag.length > 0 ) tag = tag[ 0 ];    // if tag is specified, grab it from the first Array element
 			else str = ( tag = 'div' ) + str;               // if not, tag will default to DIV
 			elem = document.createElement( tag );
 			if ( classes ) elem.className = classes.join( '' ).substring( 1 ).replace( /\./g, ' ' );
 			if ( id[ 0 ] ) elem.id = id[ 0 ].substring( 1 );
 			if ( attrs[ 0 ] ) this.set_attributes( elem, attrs );
-			if ( text[ 0 ] ) elem.appendChild( document.createTextNode( text[ 0 ].substring( 1, text[ 0 ].length - 1 ) ) );
+			if ( text[ 0 ] ) elem.appendChild( document.createTextNode( text ) );
 			cache[ str ] = elem.cloneNode( false );
 			return elem;
 		},
