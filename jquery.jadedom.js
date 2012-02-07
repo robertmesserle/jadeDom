@@ -1,8 +1,6 @@
 /*! jadeDom v1.0 by Robert Messerle  |  https://github.com/robertmesserle/jadeDom */
 ( function ( $ ) {
 
-	var cache = {};
-
 	function jadeDom () {
 		this.lookup_table = {};
 	}
