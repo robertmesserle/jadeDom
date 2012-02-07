@@ -101,15 +101,19 @@
 		this.clss    = false;
 		this.elem    = false;
 
-		if ( this.mode === 'text' ) {
+		if ( this.cache[ str ] ) {
+			this.elem = this.cache[ str ].cloneNode( false );
+		} else if ( this.mode === 'text' ) {
 			this.elem = document.createTextNode( this.str.substring( 0, this.len ).replace( /^\|\s?/, '' ) );
 		} else {
 			this.parse();
 			this.create_element();
+			this.cache[ str ] = this.elem.cloneNode( false );
 		}
 	}
 	JadeParser.prototype = {
 		mode_lookup: { '#': 'id', '.': 'class', '(': 'attributes', '|': 'text' },
+		cache: {},
 		jump_to_next: function ( len ) {
 			this.mode = false;
 			this.cur += len - 1;
