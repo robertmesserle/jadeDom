@@ -107,7 +107,6 @@
 			this.parse();
 			this.create_element();
 		}
-		console.log( this.elem );
 	}
 	JadeParser.prototype = {
 		mode_lookup: { '#': 'id', '.': 'class', '(': 'attributes', '|': 'text' },
@@ -159,7 +158,6 @@
 				else if ( key = this.str.substring( this.cur ).match( /^\,\s*/ ) ) this.cur += key.length;
 			},
 			'text': function () {
-				console.log( 'handling text', this.str );
 				this.text = this.str.substring( this.cur, this.len ).replace( /^\s+/, '' );
 				this.str = this.str.substring( 0, this.cur );
 			}
