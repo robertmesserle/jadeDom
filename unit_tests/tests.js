@@ -251,6 +251,27 @@ describe( 'jadeDom', function () {
 			} );
 		} );
 
+		describe( 'Anchor tag with inline span and text (from cache)', function () {
+			var $elem = $.jade(
+				'a.some_class(href=#, title=Some title)', [
+					'| This is some text with a ',
+					'span span',
+					'|  in the middle of it.'
+				]
+			);
+			it( 'should be an anchor tag with a calss of "some_class"', function () {
+				expect( $elem.is( 'a' ) ).toBe( true );
+				expect( $elem.is( '.some_class' ) ).toBe( true );
+			} );
+			it( 'should have a span tag with the text "span"', function () {
+				expect( $elem.children( 'span' ).length ).toBe( 1 );
+				expect( $elem.children( 'span:first' ).text() ).toBe( 'span' );
+			} );
+			it( 'should have the text "This is some text with a span in the middle of it."', function () {
+				expect( $elem.text() ).toBe( 'This is some text with a span in the middle of it.' );
+			} );
+		} );
+
 	} );
 
 } );
