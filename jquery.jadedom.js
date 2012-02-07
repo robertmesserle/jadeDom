@@ -90,7 +90,6 @@
 			}
 			for ( ; cur < len; cur++ ) {
 				char = str.charAt( cur );
-				console.log( char, mode );
 				switch ( mode ) {
 					case 'tag':
 						tag = str.substring( cur ).match( regexp )[ 0 ] || 'div';
@@ -102,7 +101,6 @@
 						break;
 					case 'class':
 						cls = str.substring( cur ).match( regexp )[ 0 ];
-						console.log( cls );
 						classes.push( cls );
 						reset_mode( cls.length );
 						break;
