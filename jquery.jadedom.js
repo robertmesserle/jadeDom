@@ -101,7 +101,7 @@
 						cls = str.substring( cur ).match( regexp )[ 0 ];
 						classes.push( cls );
 						reset_mode( cls.length );
-					} else if ( mode == 'attributes_key' ) {
+					} else if ( mode == 'attributes' ) {
 						if ( attrs === false ) attrs = {};
 						key = str.substring( cur ).match( /^(\"[^\"]+\")|(\'[^\']+\')|([^=]+)/ )[ 0 ];
 						cur += key.length;
@@ -127,7 +127,7 @@
 				} else if ( char === '.' ) {
 					mode = 'class';
 				} else if ( char === '(' ) {
-					mode = 'attributes_key';
+					mode = 'attributes';
 				}
 			}
 			elem = this.create_element( tag || 'div', id, classes, attrs, text );
