@@ -73,56 +73,83 @@
 		get_node_from_string : function ( str ) {
 			if ( typeof cache[ str ] !== 'undefined' ) return cache[ str ].cloneNode( false );
 			if ( str.charAt( 0 ) === '|' ) return document.createTextNode( str.replace( /^\|\s*/, '' ) );
-			var start = 0,
-				cur   = 0,
-				char  = false,
-				len   = str.length,
-				attrs = false,
-				text  = false,
-				mode  = 'tag',
-				tag, classes, id;
+			str += ' ';
+			var start   = 0,
+				cur     = 0,
+				char    = false,
+				len     = str.length,
+				attrs   = false,
+				text    = false,
+				mode    = 'tag',
+				classes = [],
+				regexp  = /^[\w\d\:\_\-]+/,
+				key, val, tag, id, cls;
+			function reset_mode ( len ) {
+				mode = false;
+				cur += len - 1;
+			}
 			for ( ; cur < len; cur++ ) {
 				char = str.charAt( cur );
-				switch ( char ) {
-					case '(':
-						mode = 'attributes';
-						start = cur;
+				console.log( char, mode );
+				switch ( mode ) {
+					case 'tag':
+						tag = str.substring( cur ).match( regexp )[ 0 ] || 'div';
+						reset_mode( tag.length );
 						break;
-					case ')':
-						if ( mode !== 'attributes' ) continue;
-						mode = false;
-						attrs = str.substring( start, cur ).replace( /[\(\)]+/g, '' ).split( /[\s\,]+/g );
+					case 'id':
+						id = str.substring( cur ).match( regexp )[ 0 ];
+						reset_mode( id.length );
 						break;
-					case ' ':
-						if ( mode === 'attributes' ) continue;
-						mode = 'text';
-						text = str.substring( cur + 1 );
+					case 'class':
+						cls = str.substring( cur ).match( regexp )[ 0 ];
+						console.log( cls );
+						classes.push( cls );
+						reset_mode( cls.length );
 						break;
+					case 'attributes_key':
+						if ( attrs === false ) attrs = {};
+						key = str.substring( cur ).match( /^(\"[^\"]+\")|(\'[^\']+\')|([^=]+)/ )[ 0 ];
+						cur += key.length;
+						key = key.replace( /[\'\"]/g, '' );
+						if ( str.charAt( cur ) === '=' ) {
+							val = str.substring( cur + 1 ).match( /^(\"[^\"]+\")|(\'[^\']+\')|([^\,\)]+)/ )[ 0 ];
+							cur += val.length + 1;
+							val = val.replace( /[\'\"]/g, '' );
+						} else {
+							val = key;
+						}
+						attrs[ key ] = val;
+						if ( cur > str.length - 2 ) break;
+						else if ( str.charAt( cur ) === ')' ) mode = false;
+						else if ( key = str.substring( cur ).match( /^\,\s*/ ) ) cur += key.length;
+						break;
+					default:
+						if ( char.match( /\w/ ) ) {
+							mode = 'text';
+							text = str.substring( cur, str.length - 1 ).replace( /^\s+/, '' );
+							str = str.substring( 0, cur );
+							break;
+						}
+						if ( char === '#' ) { mode = 'id';             break; }
+						if ( char === '.' ) { mode = 'class';          break; }
+						if ( char === '(' ) { mode = 'attributes_key'; break; }
 				}
 				if ( mode === 'text' ) break;
 			}
-			str = str.substring( 0, cur );
-			tag         = str.match( /^[\w\d]+/i );
-			classes     = str.match( /\.[\w\d\-\_]+/gi );
-			id          = str.match( /\#[\w\d\-\_]+/i ) || [];
-			if ( tag && tag.length > 0 ) tag = tag[ 0 ];    // if tag is specified, grab it from the first Array element
-			else str = ( tag = 'div' ) + str;               // if not, tag will default to DIV
-			elem = document.createElement( tag );
-			if ( classes ) elem.className = classes.join( '' ).substring( 1 ).replace( /\./g, ' ' );
-			if ( id[ 0 ] ) elem.id = id[ 0 ].substring( 1 );
-			if ( attrs[ 0 ] ) this.set_attributes( elem, attrs );
-			if ( text[ 0 ] ) elem.appendChild( document.createTextNode( text ) );
+			elem = this.create_element( tag || 'div', id, classes, attrs, text );
 			cache[ str ] = elem.cloneNode( false );
 			return elem;
 		},
+		create_element: function ( tag, id, classes, attrs, text ) {
+			var elem = document.createElement( tag || 'div' );
+			if ( id ) elem.id = id;
+			if ( classes.length ) elem.className = classes.join( ' ' );
+			if ( attrs ) this.set_attributes( elem, attrs );
+			if ( text[ 0 ] ) elem.appendChild( document.createTextNode( text ) );
+			return elem;
+		},
 		set_attributes : function ( elem, attrs ) {
-			var len, split;
-			if ( len = attrs.length ) while ( len-- ) {
-				split = attrs[ len ].split( /[\[\]\=]/g );
-				split[ 0 ] || split.shift();
-				split[ split.length - 1 ] || split.pop();
-				this.set_attribute( elem, split[ 0 ], split[ 1 ] );
-			}
+			for ( var key in attrs ) this.set_attribute( elem, key, attrs[ key ] );
 		},
 		set_attribute : function ( elem, key, value ) {
 			switch ( key ) {

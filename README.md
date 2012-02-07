@@ -1,4 +1,4 @@
-# zenDom
+# jadeDom
 
 jadeDom is a [jQuery](http://www.jquery.com/) plugin to help render DOM elements with [Jade](http://jade-lang.com/) syntax.
 
@@ -40,7 +40,7 @@ $('#wrapper').append( $.jade(
 ```javascript
 $('#wrapper').append( $.jade(
   'div.class_name', { click: function () { ... } }, [
-    'a.inner_class(href=#) Some text'
+    'a.inner_class(href=#, title="Some title") Some text'
   ]
 ) );
 ```
