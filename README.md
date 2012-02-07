@@ -9,7 +9,7 @@ jadeDom is a [jQuery](http://www.jquery.com/) plugin to help render DOM elements
 ```javascript
 $('#wrapper').append( [
   '<div class="class_name">',
-    '<div class="inner_class">Some text</div>',
+    '<a href="#" title="Some title" class="inner_class">Some text</div>',
   '</div>'
 ].join( '' ) );
 $('#wrapper .class_name' ).click( function () { alert('hi'); } );
@@ -20,7 +20,7 @@ $('#wrapper .class_name' ).click( function () { alert('hi'); } );
 ```javascript
 $('#wrapper').append(
   $( '<div />', { 'class': 'class_name', click: function () { ... } } ).append(
-    $( '<div />', { 'class': 'inner_class', text: 'Some text' } )
+    $( '<a />', { 'class': 'inner_class', href: '#', title: 'Some title', text: 'Some text' } )
   )
 );
 ```
@@ -30,7 +30,7 @@ $('#wrapper').append(
 ```javascript
 $('#wrapper').append( $.jade(
   'div.class_name', { click: function () { ... } }, [
-    'a.inner_class[href=#]{Some text}'
+    'a.inner_class[href=#][title=Some title]{Some text}'
   ]
 ) );
 ```
