@@ -28,7 +28,7 @@ $('#wrapper').append(
 ### zenDom
 
 ```javascript
-$('#wrapper').append( $.jade(
+$('#wrapper').append( $.zen(
   'div.class_name', { click: function () { ... } }, [
     'a.inner_class[href=#][title=Some title]{Some text}'
   ]
