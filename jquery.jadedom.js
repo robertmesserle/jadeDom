@@ -70,79 +70,9 @@
 			if ( elem.jquery ) return elem.get( 0 );
 			if ( elem.nodeType ) return elem;
 		},
-		get_mode: function ( char ) {
-			return char.match( /\s/ ) ? 'text'
-				: char === '#' ? 'id'
-				: char === '.' ? 'class'
-				: char === '(' ? 'attributes'
-				: false;
-		},
 		get_node_from_string : function ( str ) {
-			if ( typeof cache[ str ] !== 'undefined' ) return cache[ str ].cloneNode( false );
-			if ( str.charAt( 0 ) === '|' ) return document.createTextNode( str.replace( /^\|\s*/, '' ) );
-			str += ' ';
-			var cur     = 0,
-				char    = false,
-				len     = str.length,
-				attrs   = false,
-				text    = false,
-				mode    = 'tag',
-				classes = [],
-				regexp  = /^[\w\d\:\_\-]+/,
-				key, val, tag, id, cls;
-			function reset_mode ( len ) {
-				mode = false;
-				cur += len - 1;
-			}
-			for ( ; cur < len && mode !== 'text'; cur++ ) {
-				char = str.charAt( cur );
-				if ( mode === false ) {
-					mode = this.get_mode( char );
-					if ( mode === 'text' ) {
-						text = str.substring( cur, str.length - 1 ).replace( /^\s+/, '' );
-						str = str.substring( 0, cur );
-					}
-				} else {
-					if ( mode === 'tag' ) {
-						tag = str.substring( cur ).match( regexp )[ 0 ] || 'div';
-						reset_mode( tag.length );
-					} else if ( mode === 'id' ) {
-						id = str.substring( cur ).match( regexp )[ 0 ];
-						reset_mode( id.length );
-					} else if ( mode === 'class' ) {
-						cls = str.substring( cur ).match( regexp )[ 0 ];
-						classes.push( cls );
-						reset_mode( cls.length );
-					} else if ( mode == 'attributes' ) {
-						if ( attrs === false ) attrs = {};
-						key = str.substring( cur ).match( /^(\"[^\"]+\")|(\'[^\']+\')|([^=]+)/ )[ 0 ];
-						cur += key.length;
-						key = key.replace( /[\'\"]/g, '' );
-						if ( str.charAt( cur ) === '=' ) {
-							val = str.substring( cur + 1 ).match( /^(\"[^\"]+\")|(\'[^\']+\')|([^\,\)]+)/ )[ 0 ];
-							cur += val.length + 1;
-							val = val.replace( /[\'\"]/g, '' );
-						} else {
-							val = key;
-						}
-						attrs[ key ] = val;
-						if ( str.length < cur + 1 );
-						else if ( str.charAt( cur ) === ')' ) mode = false;
-						else if ( key = str.substring( cur ).match( /^\,\s*/ ) ) cur += key.length;
-					}
-				}
-			}
-			elem = this.create_element( tag || 'div', id, classes, attrs, text );
-			cache[ str ] = elem.cloneNode( false );
-			return elem;
-		},
-		create_element: function ( tag, id, classes, attrs, text ) {
-			var elem = document.createElement( tag || 'div' );
-			if ( id ) elem.id = id;
-			if ( classes.length ) elem.className = classes.join( ' ' );
-			if ( attrs ) this.set_attributes( elem, attrs );
-			if ( text[ 0 ] ) elem.appendChild( document.createTextNode( text ) );
-			return elem;
+			var parser = new JadeParser( this, str );
+			return parser.elem;
 		},
 		set_attributes : function ( elem, attrs ) {
 			for ( var key in attrs ) this.set_attribute( elem, key, attrs[ key ] );
@@ -153,6 +83,95 @@
 				case 'className': elem.className = value;           break;
 				case 'style':     elem.style.cssText = value;       break;
 				default:          elem.setAttribute( key, value );  break;
+			}
+		}
+	};
+
+	function JadeParser ( parent, str ) {
+		this.parent  = parent;
+		this.str     = str + ' ';
+		this.mode    = str.charAt( 0 ) === '|' ? 'text' : 'tag';
+		this.cur     = 0;
+		this.char    = false;
+		this.len     = str.length;
+		this.attrs   = false;
+		this.text    = false;
+		this.classes = [];
+		this.tag     = false;
+		this.id      = false;
+		this.clss    = false;
+		this.elem    = false;
+
+		if ( this.mode === 'text' ) {
+			this.elem = document.createTextNode( this.str.replace( /^\|\s*/, '' ) );
+		} else {
+			this.parse();
+			this.create_element();
+		}
+	}
+	JadeParser.prototype = {
+		mode_lookup: { '#': 'id', '.': 'class', '(': 'attributes', '|': 'text' },
+		jump_to_next: function ( len ) {
+			this.mode = false;
+			this.cur += len - 1;
+		},
+		create_element: function () {
+			this.elem = document.createElement( this.tag || 'div' );
+			if ( this.id ) this.elem.id = this.id;
+			if ( this.classes.length ) this.elem.className = this.classes.join( ' ' );
+			if ( this.attrs ) this.parent.set_attributes( this.elem, this.attrs );
+			if ( this.text[ 0 ] ) this.elem.appendChild( document.createTextNode( this.text ) );
+		},
+		get_mode: function () {
+			this.mode = this.char.match( /\s/ ) ? 'text' : this.mode_lookup[ this.char ] || false;
+			if ( this.mode === 'text' ) this.get_content();
+		},
+		handle_mode: {
+			'tag': function () {
+				this.tag = this.str.substring( this.cur ).match( /^[\w\d\:\_\-]+/ );[ 0 ] || 'div';
+				this.jump_to_next( this.tag.length );
+			},
+			'class': function () {
+				var cls = this.str.substring( this.cur ).match( /^[\w\d\:\_\-]+/ )[ 0 ];
+				this.classes.push( cls );
+				this.jump_to_next( cls.length );
+			},
+			'id': function () {
+				this.id = this.str.substring( this.cur ).match( /^[\w\d\:\_\-]+/ )[ 0 ];
+				this.jump_to_next( this.id.length );
+			},
+			'attributes': function () {
+				var key, val;
+				if ( this.attrs === false ) this.attrs = {};
+				key = this.str.substring( this.cur ).match( /^(\"[^\"]+\")|(\'[^\']+\')|([^=]+)/ )[ 0 ];
+				this.cur += key.length;
+				key = key.replace( /[\'\"]/g, '' );
+				if ( this.str.charAt( this.cur ) === '=' ) {
+					val = this.str.substring( this.cur + 1 ).match( /^(\"[^\"]+\")|(\'[^\']+\')|([^\,\)]+)/ )[ 0 ];
+					this.cur += val.length + 1;
+					val = val.replace( /[\'\"]/g, '' );
+				} else {
+					val = key;
+				}
+				this.attrs[ key ] = val;
+				if ( this.len < this.cur + 1 );
+				else if ( this.str.charAt( this.cur ) === ')' ) this.mode = false;
+				else if ( key = this.str.substring( this.cur ).match( /^\,\s*/ ) ) this.cur += key.length;
+			},
+			'text': function () {
+				console.log( 'handling text', this.str );
+				this.text = this.str.substring( this.cur, this.len ).replace( /^\s+/, '' );
+				this.str = this.str.substring( 0, this.cur );
+			}
+		},
+		get_content: function () {
+			this.handle_mode[ this.mode ].apply( this );
+		},
+		parse: function () {
+			for ( ; this.cur < this.len && this.mode !== 'text'; this.cur++ ) {
+				this.char = this.str.charAt( this.cur );
+				if ( this.mode === false ) this.get_mode();
+				else this.get_content();
 			}
 		}
 	};
