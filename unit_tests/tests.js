@@ -176,7 +176,7 @@ describe( 'jadeDom', function () {
 			} );
 		} );
 
-		describe ( '', function () {
+		describe ( 'Child with multiple attributes', function () {
 			var $elem = $.jade(
 				'div.class_name', [
 					'a.inner_class(href=#, title="Some title") Some text'
@@ -200,6 +200,51 @@ describe( 'jadeDom', function () {
 			} );
 			it( 'should have a child anchor that says "Some text"', function () {
 				expect( $elem.children( ':first' ).text() ).toBe( 'Some text' );
+			} );
+		} );
+
+		describe ( 'Child with multiple attributes applied through object', function () {
+			var $elem = $.jade(
+				'div.class_name', [
+					'a.inner_class', { text: 'Some text', title: 'Some title', href: '#' }
+				]
+			);
+
+			it( 'should have a class of "class_name"', function () {
+				expect( $elem.is( '.class_name' ) ).toBe( true );
+			} );
+			it( 'should have a child anchor', function () {
+				expect( $elem.children( ':first' ).is( 'a' ) ).toBe( true );
+			} );
+			it( 'should have a child with a class of "inner_class"', function () {
+				expect( $elem.children( ':first' ).is( '.inner_class' ) ).toBe( true );
+			} );
+			it( 'should have a child anchor that points to "#"', function () {
+				expect( $elem.children( ':first' ).attr( 'href' ) ).toBe( '#' );
+			} );
+			it( 'should have a child anchor with a title of "Some title"', function () {
+				expect( $elem.children( ':first' ).attr( 'title' ) ).toBe( 'Some title' );
+			} );
+			it( 'should have a child anchor that says "Some text"', function () {
+				expect( $elem.children( ':first' ).text() ).toBe( 'Some text' );
+			} );
+		} );
+
+		describe( 'Anchor tag with inline span and text', function () {
+			var $elem = $.jade(
+				'a.some_class(href=#, title=Some title)', [
+					'| This is some text with a ',
+					'span span',
+					'| in the middle of it.'
+				]
+			);
+			it( 'should be an anchor tag with a calss of "some_class"', function () {
+				expect( $elem.is( 'a' ) ).toBe( true );
+				expect( $elem.is( '.some_class' ) ).toBe( true );
+			} );
+			it( 'should have a span tag with the text "span"', function () {
+				expect( $elem.children( 'span' ).length ).toBe( 1 );
+				expect( $elem.children( 'span:first' ).text() ).toBe( 'span' );
 			} );
 		} );
 

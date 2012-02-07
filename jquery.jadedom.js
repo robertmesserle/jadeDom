@@ -70,12 +70,18 @@
 			if ( elem.jquery ) return elem.get( 0 );
 			if ( elem.nodeType ) return elem;
 		},
+		get_mode: function ( char ) {
+			return char.match( /\s/ ) ? 'text'
+				: char === '#' ? 'id'
+				: char === '.' ? 'class'
+				: char === '(' ? 'attributes'
+				: false;
+		},
 		get_node_from_string : function ( str ) {
 			if ( typeof cache[ str ] !== 'undefined' ) return cache[ str ].cloneNode( false );
 			if ( str.charAt( 0 ) === '|' ) return document.createTextNode( str.replace( /^\|\s*/, '' ) );
 			str += ' ';
-			var start   = 0,
-				cur     = 0,
+			var cur     = 0,
 				char    = false,
 				len     = str.length,
 				attrs   = false,
@@ -90,7 +96,13 @@
 			}
 			for ( ; cur < len && mode !== 'text'; cur++ ) {
 				char = str.charAt( cur );
-				if ( mode !== false ) {
+				if ( mode === false ) {
+					mode = this.get_mode( char );
+					if ( mode === 'text' ) {
+						text = str.substring( cur, str.length - 1 ).replace( /^\s+/, '' );
+						str = str.substring( 0, cur );
+					}
+				} else {
 					if ( mode === 'tag' ) {
 						tag = str.substring( cur ).match( regexp )[ 0 ] || 'div';
 						reset_mode( tag.length );
@@ -118,16 +130,6 @@
 						else if ( str.charAt( cur ) === ')' ) mode = false;
 						else if ( key = str.substring( cur ).match( /^\,\s*/ ) ) cur += key.length;
 					}
-				} else if ( char.match( /\w/ ) ) {
-					mode = 'text';
-					text = str.substring( cur, str.length - 1 ).replace( /^\s+/, '' );
-					str = str.substring( 0, cur );
-				} else if ( char === '#' ) {
-					mode = 'id';
-				} else if ( char === '.' ) {
-					mode = 'class';
-				} else if ( char === '(' ) {
-					mode = 'attributes';
 				}
 			}
 			elem = this.create_element( tag || 'div', id, classes, attrs, text );
