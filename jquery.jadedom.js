@@ -71,8 +71,7 @@
 			if ( elem.nodeType ) return elem;
 		},
 		get_node_from_string : function ( str ) {
-			var parser = new JadeParser( this, str );
-			return parser.elem;
+			return new JadeParser( this, str ).elem;
 		},
 		set_attributes : function ( elem, attrs ) {
 			for ( var key in attrs ) this.set_attribute( elem, key, attrs[ key ] );
