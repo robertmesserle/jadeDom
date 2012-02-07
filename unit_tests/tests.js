@@ -235,7 +235,7 @@ describe( 'jadeDom', function () {
 				'a.some_class(href=#, title=Some title)', [
 					'| This is some text with a ',
 					'span span',
-					'| in the middle of it.'
+					'|  in the middle of it.'
 				]
 			);
 			it( 'should be an anchor tag with a calss of "some_class"', function () {
@@ -245,6 +245,9 @@ describe( 'jadeDom', function () {
 			it( 'should have a span tag with the text "span"', function () {
 				expect( $elem.children( 'span' ).length ).toBe( 1 );
 				expect( $elem.children( 'span:first' ).text() ).toBe( 'span' );
+			} );
+			it( 'should have the text "This is some text with a span in the middle of it."', function () {
+				expect( $elem.text() ).toBe( 'This is some text with a span in the middle of it.' );
 			} );
 		} );
 

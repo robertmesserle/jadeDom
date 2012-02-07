@@ -102,11 +102,12 @@
 		this.elem    = false;
 
 		if ( this.mode === 'text' ) {
-			this.elem = document.createTextNode( this.str.replace( /^\|\s*/, '' ) );
+			this.elem = document.createTextNode( this.str.substring( 0, this.len ).replace( /^\|\s?/, '' ) );
 		} else {
 			this.parse();
 			this.create_element();
 		}
+		console.log( this.elem );
 	}
 	JadeParser.prototype = {
 		mode_lookup: { '#': 'id', '.': 'class', '(': 'attributes', '|': 'text' },
