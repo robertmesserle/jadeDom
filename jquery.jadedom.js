@@ -88,23 +88,20 @@
 				mode = false;
 				cur += len - 1;
 			}
-			for ( ; cur < len; cur++ ) {
+			for ( ; cur < len && mode !== 'text'; cur++ ) {
 				char = str.charAt( cur );
-				switch ( mode ) {
-					case 'tag':
+				if ( mode !== false ) {
+					if ( mode === 'tag' ) {
 						tag = str.substring( cur ).match( regexp )[ 0 ] || 'div';
 						reset_mode( tag.length );
-						break;
-					case 'id':
+					} else if ( mode === 'id' ) {
 						id = str.substring( cur ).match( regexp )[ 0 ];
 						reset_mode( id.length );
-						break;
-					case 'class':
+					} else if ( mode === 'class' ) {
 						cls = str.substring( cur ).match( regexp )[ 0 ];
 						classes.push( cls );
 						reset_mode( cls.length );
-						break;
-					case 'attributes_key':
+					} else if ( mode == 'attributes_key' ) {
 						if ( attrs === false ) attrs = {};
 						key = str.substring( cur ).match( /^(\"[^\"]+\")|(\'[^\']+\')|([^=]+)/ )[ 0 ];
 						cur += key.length;
@@ -117,22 +114,21 @@
 							val = key;
 						}
 						attrs[ key ] = val;
-						if ( cur > str.length - 2 ) break;
+						if ( str.length < cur + 1 );
 						else if ( str.charAt( cur ) === ')' ) mode = false;
 						else if ( key = str.substring( cur ).match( /^\,\s*/ ) ) cur += key.length;
-						break;
-					default:
-						if ( char.match( /\w/ ) ) {
-							mode = 'text';
-							text = str.substring( cur, str.length - 1 ).replace( /^\s+/, '' );
-							str = str.substring( 0, cur );
-							break;
-						}
-						if ( char === '#' ) { mode = 'id';             break; }
-						if ( char === '.' ) { mode = 'class';          break; }
-						if ( char === '(' ) { mode = 'attributes_key'; break; }
+					}
+				} else if ( char.match( /\w/ ) ) {
+					mode = 'text';
+					text = str.substring( cur, str.length - 1 ).replace( /^\s+/, '' );
+					str = str.substring( 0, cur );
+				} else if ( char === '#' ) {
+					mode = 'id';
+				} else if ( char === '.' ) {
+					mode = 'class';
+				} else if ( char === '(' ) {
+					mode = 'attributes_key';
 				}
-				if ( mode === 'text' ) break;
 			}
 			elem = this.create_element( tag || 'div', id, classes, attrs, text );
 			cache[ str ] = elem.cloneNode( false );
