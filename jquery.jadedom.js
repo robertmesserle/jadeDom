@@ -117,7 +117,7 @@
 		},
 		jump_to_next: function ( len ) {
 			this.mode = false;
-			this.cur += len - 1;
+			this.cur += len;
 		},
 		create_element: function () {
 			this.elem = document.createElement( this.tag || 'div' );
@@ -128,11 +128,10 @@
 		},
 		get_mode: function () {
 			this.mode = this.char.match( /\s/ ) ? 'text' : this.mode_lookup[ this.char ] || false;
-			if ( this.mode === 'text' ) this.get_content();
 		},
 		handle_mode: {
 			'tag': function () {
-				this.tag = this.str.substring( this.cur ).match( /^[\w\d\:\_\-]+/ );[ 0 ] || 'div';
+				this.tag = this.str.substring( this.cur ).match( /^[\w\d\:\_\-]+/ )[ 0 ] || 'div';
 				this.jump_to_next( this.tag.length );
 			},
 			'class': function () {
@@ -168,13 +167,14 @@
 			}
 		},
 		get_content: function () {
+			if ( this.mode === false ) return;
 			this.handle_mode[ this.mode ].apply( this );
 		},
 		parse: function () {
 			for ( ; this.cur < this.len && this.mode !== 'text'; this.cur++ ) {
-				this.char = this.str.charAt( this.cur );
+				this.char = this.str.charAt( this.cur - 1 );
 				if ( this.mode === false ) this.get_mode();
-				else this.get_content();
+				this.get_content();
 			}
 		}
 	};

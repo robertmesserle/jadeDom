@@ -5,7 +5,7 @@ describe( 'jadeDom', function () {
 
 		describe( 'div#id', function () {
 			var $elem = $.jade( 'div#id' );
-			it ( 'should be a div tag', function () {
+			it( 'should be a div tag', function () {
 				expect( $elem.is( 'div' ) ).toBe( true );
 			} );
 			it( 'should have an id of "id"', function () {
@@ -15,7 +15,7 @@ describe( 'jadeDom', function () {
 
 		describe( 'div#id Holy Smokes', function () {
 			var $elem = $.jade( 'div#id Holy Smokes' );
-			it ( 'should be a div tag', function () {
+			it( 'should be a div tag', function () {
 				expect( $elem.is( 'div' ) ).toBe( true );
 			} );
 			it( 'should have an id of "id"', function () {
@@ -28,7 +28,7 @@ describe( 'jadeDom', function () {
 
 		describe( 'div#id.foo.bar', function () {
 			var $elem = $.jade( 'div#id.foo.bar' );
-			it ( 'should be a div tag', function () {
+			it( 'should be a div tag', function () {
 				expect( $elem.is( 'div' ) ).toBe( true );
 			} );
 			it( 'should have an id of "id"', function () {
@@ -44,7 +44,7 @@ describe( 'jadeDom', function () {
 
 		describe( 'div#id.foo.bar(href=http://www.google.com)', function () {
 			var $elem = $.jade( 'div#id.foo.bar(href=http://www.google.com)' );
-			it ( 'should be a div tag', function () {
+			it( 'should be a div tag', function () {
 				expect( $elem.is( 'div' ) ).toBe( true );
 			} );
 			it( 'should have an id of "id"', function () {
@@ -63,7 +63,7 @@ describe( 'jadeDom', function () {
 
 		describe( 'div#id.foo.bar(href=http://www.google.com, title="foobar")', function () {
 			var $elem = $.jade( 'div#id.foo.bar(href=http://www.google.com, title="foobar")' );
-			it ( 'should be a div tag', function () {
+			it( 'should be a div tag', function () {
 				expect( $elem.is( 'div' ) ).toBe( true );
 			} );
 			it( 'should have an id of "id"', function () {
@@ -85,7 +85,7 @@ describe( 'jadeDom', function () {
 
 		describe( 'div#id.foo.bar(\'href\'="http://www.google.com", title=foobar)', function () {
 			var $elem = $.jade( 'div#id.foo.bar(\'href\'="http://www.google.com", title=foobar)' );
-			it ( 'should be a div tag', function () {
+			it( 'should be a div tag', function () {
 				expect( $elem.is( 'div' ) ).toBe( true );
 			} );
 			it( 'should have an id of "id"', function () {
@@ -107,7 +107,7 @@ describe( 'jadeDom', function () {
 
 		describe( 'div#id.foo.bar(\'href\'="http://www.google.com", title=title with spaces in it)', function () {
 			var $elem = $.jade( 'div#id.foo.bar(\'href\'="http://www.google.com", title=title with spaces in it)' );
-			it ( 'should be a div tag', function () {
+			it( 'should be a div tag', function () {
 				expect( $elem.is( 'div' ) ).toBe( true );
 			} );
 			it( 'should have an id of "id"', function () {
@@ -129,7 +129,7 @@ describe( 'jadeDom', function () {
 
 		describe( 'div#id.foo.bar(\'href\'="http://www.google.com", title="title with spaces in it, as well as commas")', function () {
 			var $elem = $.jade( 'div#id.foo.bar(\'href\'="http://www.google.com", title="title with spaces in it, as well as commas")' );
-			it ( 'should be a div tag', function () {
+			it( 'should be a div tag', function () {
 				expect( $elem.is( 'div' ) ).toBe( true );
 			} );
 			it( 'should have an id of "id"', function () {
@@ -159,10 +159,10 @@ describe( 'jadeDom', function () {
 				]
 			);
 
-			it ( 'should be a div tag', function () {
+			it( 'should be a div tag', function () {
 				expect( $elem.is( 'div' ) ).toBe( true );
 			} );
-			it ( 'should have a class of "wrapper"', function () {
+			it( 'should have a class of "wrapper"', function () {
 				expect( $elem.hasClass( 'wrapper' ) ).toBe( true );
 			} );
 			it( 'should have a child that is a div', function () {
