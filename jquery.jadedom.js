@@ -94,7 +94,7 @@
 		this.char    = false;
 		this.len     = str.length;
 		this.attrs   = false;
-		this.text    = false;
+		this.html    = false;
 		this.classes = [];
 		this.tag     = false;
 		this.id      = false;
@@ -104,12 +104,12 @@
 		this.init();
 	}
 	JadeParser.prototype = {
-		mode_lookup: { '#': 'id', '.': 'class', '(': 'attributes', '|': 'text' },
+		mode_lookup: { '#': 'id', '.': 'class', '(': 'attributes', '|': 'html' },
 		cache: {},
 		init: function () {
 			if ( this.cache[ this.str ] ) {
 				this.elem = this.cache[ this.str ].cloneNode( false );
-			} else if ( this.mode === 'text' ) {
+			} else if ( this.mode === 'html' ) {
 				this.elem = document.createTextNode( this.str.substring( 0, this.len ).replace( /^\|\s?/, '' ) );
 			} else {
 				this.parse();
@@ -119,7 +119,7 @@
 		},
 		get_first_mode: function () {
 			var char = this.str.charAt( 0 );
-			return char === '|' ? 'text' : char.match( /\w/ ) ? 'tag' : false;
+			return char === '|' ? 'html' : char.match( /\w/ ) ? 'tag' : false;
 		},
 		jump_to_next: function ( len ) {
 			this.mode = false;
@@ -130,10 +130,10 @@
 			if ( this.id ) this.elem.id = this.id;
 			if ( this.classes.length ) this.elem.className = this.classes.join( ' ' );
 			if ( this.attrs ) this.parent.set_attributes( this.elem, this.attrs );
-			if ( this.text[ 0 ] ) this.elem.innerHTML = this.text;
+			if ( this.html[ 0 ] ) this.elem.innerHTML = this.html;
 		},
 		get_mode: function () {
-			this.mode = this.char.match( /\s/ ) ? 'text' : this.mode_lookup[ this.char ] || false;
+			this.mode = this.char.match( /\s/ ) ? 'html' : this.mode_lookup[ this.char ] || false;
 		},
 		handle_mode: {
 			'tag': function () {
@@ -167,12 +167,12 @@
 				else if ( this.str.charAt( this.cur ) === ')' ) this.mode = false;
 				else if ( key = this.str.substring( this.cur ).match( /^\,\s*/ ) ) this.cur += key.length;
 			},
-			'text': function () {
-				this.text = this.str.substring( this.cur, this.len ).replace( /^\s+/, '' );
+			'html': function () {
+				this.html = this.str.substring( this.cur, this.len ).replace( /^\s+/, '' );
 				if ( this.parent.map !== false ) {
 					for ( var key in this.parent.map ) {
-						this.text = this.text.replace( new RegExp( '#\\{' + key + '\\}', 'g' ), this.escape_html( this.parent.map[ key ] ) );
-						this.text = this.text.replace( new RegExp( '!\\{' + key + '\\}', 'g' ), this.parent.map[ key ] );
+						this.html = this.html.replace( new RegExp( '#\\{' + key + '\\}', 'g' ), this.escape_html( this.parent.map[ key ] ) );
+						this.html = this.html.replace( new RegExp( '!\\{' + key + '\\}', 'g' ), this.parent.map[ key ] );
 					}
 				}
 				this.str = this.str.substring( 0, this.cur );
@@ -186,7 +186,7 @@
 			this.handle_mode[ this.mode ].apply( this );
 		},
 		parse: function () {
-			while ( this.cur < this.len && this.mode !== 'text' ) {
+			while ( this.cur < this.len && this.mode !== 'html' ) {
 				if ( this.mode !== 'tag' ) this.char = this.str.charAt( this.cur++ );
 				if ( this.mode === false ) this.get_mode();
 				this.get_content();
