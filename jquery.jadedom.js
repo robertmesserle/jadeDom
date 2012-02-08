@@ -130,7 +130,7 @@
 			if ( this.id ) this.elem.id = this.id;
 			if ( this.classes.length ) this.elem.className = this.classes.join( ' ' );
 			if ( this.attrs ) this.parent.set_attributes( this.elem, this.attrs );
-			if ( this.text[ 0 ] ) this.elem.appendChild( document.createTextNode( this.text ) );
+			if ( this.text[ 0 ] ) this.elem.innerHTML = this.text;
 		},
 		get_mode: function () {
 			this.mode = this.char.match( /\s/ ) ? 'text' : this.mode_lookup[ this.char ] || false;
@@ -171,11 +171,15 @@
 				this.text = this.str.substring( this.cur, this.len ).replace( /^\s+/, '' );
 				if ( this.parent.map !== false ) {
 					for ( var key in this.parent.map ) {
-						this.text = this.text.replace( new RegExp( '\#\{' + key + '\}', 'g' ), this.parent.map[ key ] );
+						this.text = this.text.replace( new RegExp( '#\\{' + key + '\\}', 'g' ), this.escape_html( this.parent.map[ key ] ) );
+						this.text = this.text.replace( new RegExp( '!\\{' + key + '\\}', 'g' ), this.parent.map[ key ] );
 					}
 				}
 				this.str = this.str.substring( 0, this.cur );
 			}
+		},
+		escape_html: function ( str ) {
+			return str.replace( /&/g, '&ampl;' ).replace( />/g, '&gt;' ).replace( /</g, '&lt;' ).replace( /"/g, '&quot;' );
 		},
 		get_content: function () {
 			if ( this.mode === false ) return;
