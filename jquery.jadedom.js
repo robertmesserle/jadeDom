@@ -3,9 +3,9 @@
 
 	function jadeDom () {
 		this.lookup_table = {};
+		this.map = false;
 	}
 	jadeDom.prototype = {
-		map: false,
 		init: function ( args ) {
 			this.get_map( args );
 			var ret = this.add_children( false, args, true ),
