@@ -7,21 +7,17 @@
 	}
 	jadeDom.prototype = {
 		init: function ( args ) {
-			this.get_map( args );
 			var ret = this.add_children( false, args, true ),
 				$ret = $( ret );
 			$ret.lookup = $.proxy( this, 'lookup' );
 			return $ret;
 		},
-		get_map: function ( args ) {
-			if ( typeof args[ 0 ] !== 'object' || args[ 0 ] instanceof Array ) return;
-			this.map = args.shift();
-		},
 		lookup: function ( str ) {
 			if ( !str ) return this.lookup_table;
 			return this.lookup_table[ str ] || false;
 		},
-		handle_object : function ( elem, obj ) {
+		handle_object: function ( elem, obj ) {
+			if ( elem === false ) return this.map = obj;
 			var $elem = $(elem), val;
 			for ( var key in obj ) {
 				val = obj[ key ];
