@@ -171,8 +171,8 @@
 			this.handle_mode[ this.mode ].apply( this );
 		},
 		parse: function () {
-			for ( ; this.cur < this.len && this.mode !== 'text'; this.cur++ ) {
-				this.char = this.str.charAt( this.cur - 1 );
+			while ( this.cur < this.len && this.mode !== 'text' ) {
+				if ( this.mode !== 'tag' ) this.char = this.str.charAt( this.cur++ );
 				if ( this.mode === false ) this.get_mode();
 				this.get_content();
 			}
