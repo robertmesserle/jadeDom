@@ -5,11 +5,17 @@
 		this.lookup_table = {};
 	}
 	jadeDom.prototype = {
+		map: false,
 		init: function ( args ) {
+			this.get_map( args );
 			var ret = this.add_children( false, args, true ),
 				$ret = $( ret );
 			$ret.lookup = $.proxy( this, 'lookup' );
 			return $ret;
+		},
+		get_map: function ( args ) {
+			if ( typeof args[ 0 ] !== 'object' || args[ 0 ] instanceof Array ) return;
+			this.map = args.shift();
 		},
 		lookup: function ( str ) {
 			if ( !str ) return this.lookup_table;
@@ -167,6 +173,11 @@
 			},
 			'text': function () {
 				this.text = this.str.substring( this.cur, this.len ).replace( /^\s+/, '' );
+				if ( this.parent.map !== false ) {
+					for ( var key in this.parent.map ) {
+						this.text = this.text.replace( new RegExp( '\#\{' + key + '\}', 'g' ), this.parent.map[ key ] );
+					}
+				}
 				this.str = this.str.substring( 0, this.cur );
 			}
 		},
@@ -185,7 +196,7 @@
 
 	$.jade = function () {
 		var jade = new jadeDom();
-		return jade.init( arguments );
+		return jade.init( Array.apply( null, arguments ) );
 	};
 
 } )( jQuery );

@@ -284,4 +284,18 @@ describe( 'jadeDom', function () {
 
 	} );
 
+	describe( 'Variable Replacement', function () {
+
+		describe( 'Basic token replacement', function () {
+			var $elem = $.jade( { name: 'Robert' }, 'h1#welcome Hello #{name}!' );
+			it( 'should be an h1 tag', function () {
+				expect( $elem.is( 'h1' ) ).toBe( true );
+			} );
+			it( 'should say, "Hello Robert!"', function () {
+				expect( $elem.text() ).toBe( 'Hello Robert!' );
+			} );
+		} );
+
+	} );
+
 } );
