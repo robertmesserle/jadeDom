@@ -110,12 +110,19 @@
 			if ( this.cache[ this.str ] ) {
 				this.elem = this.cache[ this.str ].cloneNode( false );
 			} else if ( this.mode === 'html' ) {
-				this.elem = document.createTextNode( this.str.substring( 0, this.len ).replace( /^\|\s?/, '' ) );
+				this.elem = this.get_html_fragment( this.str.substring( 0, this.len ).replace( /^\|\s?/, '' ) );
 			} else {
 				this.parse();
 				this.create_element();
 				this.cache[ this.str ] = this.elem.cloneNode( false );
 			}
+		},
+		get_html_fragment: function ( str ) {
+			var frag = document.createDocumentFragment(),
+				div  = document.createElement( 'div' );
+			div.innerHTML = str;
+			while ( div.childNodes.length ) frag.appendChild( div.childNodes[ 0 ] );
+			return frag;
 		},
 		get_first_mode: function () {
 			var char = this.str.charAt( 0 );
