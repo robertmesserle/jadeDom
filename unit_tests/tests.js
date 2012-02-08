@@ -333,7 +333,6 @@ describe( 'jadeDom', function () {
 
 		} );
 
-
 		describe( 'Escaped', function () {
 
 			describe( 'Basic token replacement', function () {
