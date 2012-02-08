@@ -119,9 +119,11 @@
 		},
 		get_html_fragment: function ( str ) {
 			var frag = document.createDocumentFragment(),
-				div  = document.createElement( 'div' );
+				div  = document.createElement( 'div' ),
+				i;
 			div.innerHTML = str;
-			while ( div.childNodes.length ) frag.appendChild( div.childNodes[ 0 ] );
+			i = div.childNodes.length;
+			while ( i-- ) frag.appendChild( div.childNodes[ 0 ] );
 			return frag;
 		},
 		get_first_mode: function () {
