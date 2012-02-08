@@ -328,4 +328,38 @@ describe( 'jadeDom', function () {
 
 	} );
 
+	describe( 'Variable Caching', function () {
+
+		describe( 'Basic variable caching', function () {
+			var $elem = $.jade( 'div#something Howdy', { cache: 'something' } );
+			it( 'should be a div', function () {
+				expect( $elem.is( 'div' ) ).toBe( true );
+			} );
+			it( 'should have an id of "something"', function () {
+				expect( $elem.is( '#something' ) ).toBe( true );
+			} );
+			it( 'should have the text of "Howdy"', function () {
+				expect( $elem.text() ).toBe( 'Howdy' );
+			} );
+			it( 'should be returned when I lookup "something"', function () {
+				expect( $elem.lookup( 'something' ).get( 0 ) ).toBe( $elem.get( 0 ) );
+			} );
+		} );
+
+		describe( 'Multiple cached DOM elements', function () {
+			var $elem = $.jade(
+				'div#wrapper', { cache: 'wrapper' }, [
+					'div#inner', { cache: 'inner' }
+				]
+			);
+			it( 'should be able to lookup "wrapper"', function () {
+				expect( $elem.lookup( 'wrapper' ).get( 0 ) ).toBe( $elem.get( 0 ) );
+			} );
+			it( 'should be able to lookup "inner"', function () {
+				expect( $elem.lookup( 'inner' ).get( 0 ) ).toBe( $elem.children( '#inner' ).get( 0 ) );
+			} );
+		} );
+
+	} );
+
 } );
