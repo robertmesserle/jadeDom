@@ -87,7 +87,7 @@
 	function JadeParser ( parent, str ) {
 		this.parent  = parent;
 		this.str     = str + ' ';
-		this.mode    = str.charAt( 0 ) === '|' ? 'text' : 'tag';
+		this.mode    = this.get_first_mode();
 		this.cur     = 0;
 		this.char    = false;
 		this.len     = str.length;
@@ -114,6 +114,10 @@
 				this.create_element();
 				this.cache[ this.str ] = this.elem.cloneNode( false );
 			}
+		},
+		get_first_mode: function () {
+			var char = this.str.charAt( 0 );
+			return char === '|' ? 'text' : char.match( /\w/ ) ? 'tag' : false;
 		},
 		jump_to_next: function ( len ) {
 			this.mode = false;

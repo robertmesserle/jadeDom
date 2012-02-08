@@ -3,6 +3,16 @@ describe( 'jadeDom', function () {
 
 	describe( 'String Parsing', function () {
 
+		describe( '#id', function () {
+			var $elem = $.jade( '#id' );
+			it( 'should default to a div', function () {
+				expect( $elem.is( 'div' ) ).toBe( true );
+			} );
+			it( 'should have an id of "id"', function () {
+				expect( $elem.is( '#id' ) ).toBe( true );
+			} );
+		} );
+
 		describe( 'div#id', function () {
 			var $elem = $.jade( 'div#id' );
 			it( 'should be a div tag', function () {
