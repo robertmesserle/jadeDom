@@ -163,7 +163,7 @@ $.jade( { text: '<b>Foobar</b>' },
 
 ```html
 <ul>
-  <li>Unescaped: <b>Foobar</b></li>
   <li>Escaped: &lt;b&gt;Foobar&lt;b&gt;</li>
+  <li>Unescaped: <b>Foobar</b></li>
 </ul>
 ```
