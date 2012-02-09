@@ -144,4 +144,26 @@ $.jade(
 ```html
 <p>foo bar baz rawr rawr super cool go jade go</p>
 ```
+#### Variables
 
+You can also use variable replacement as done in Jade.  In order to use variables, the first argument passed to jadeDom must be an object containing the lookup table.
+
+Once you have passed in this lookup table, there are two ways to call a variable within a block of text: ```!{variable}``` and ```#{variable}```.
+
+These will both do the same thing, but ```#{variable}``` will escape any HTML it finds while ```!{variable}``` will be rendered as HTML.
+
+```javascript
+$.jade( { text: '<b>Foobar</b>' },
+  'ul', [
+    'li Escaped: #{text}',
+    'li Unescaped: !{text}'
+  ]
+);
+```
+
+```html
+<ul>
+  <li>Unescaped: <b>Foobar</b></li>
+  <li>Escaped: &lt;b&gt;Foobar&lt;b&gt;</li>
+</ul>
+```
