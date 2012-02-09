@@ -51,8 +51,8 @@ $('#wrapper').append( $.jade(
 
 Arguments passed to jadeDom can be one of three types:
 
-**DOM Element**: DOM Elements can come in as a *string*, *DOM element*, *DOM Fragment*, or *jQuery DOM Object*.  The first argument **MUST** be one of these formats.
-**jQuery Options**: This is an *object* that will specify which jQuery functions to call.
+**DOM Element**: DOM Elements can come in as a *string*, *DOM element*, *DOM Fragment*, or *jQuery DOM Object*.  The first argument **MUST** be one of these formats.  
+**jQuery Options**: This is an *object* that will specify which jQuery functions to call.  
 **Child Elements**: This is an array of child elements to be attached to the most recent *DOM Element* at this depth.
 
 The example above demonstrates all 3 of these.  ```'.class_name'``` tells jadeDom to render a *div* element with a class of *class_name*. ```{ click: function () { ... } }``` attaches a click event to that element.  The following array attaches a child element to that node.
