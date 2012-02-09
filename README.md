@@ -69,6 +69,28 @@ var $something = $dom.jade( 'something' ); // something was pulled from cache by
 As you can see above, calling ```$dom.jade(str)``` on a jadeDom object will allow you to access any cached elements.  You can also access the full lookup table by calling ```$dom.jade()``` without any arguments.
  
 ### Supported Jade Features
+
+#### Tags
+
+The tag is the first string specified in your Jade string.
+
+```javascript
+$.jade( 'div' );
+```
+
+```html
+<div></div>
+```
+
+If you choose to omit the tag name, it will default to div.
+
+```javascript
+$.jade( '#foo.bar' );
+```
+
+```html
+<div id="foo" class="bar"></div>
+```
  
 #### ID's and Classes
 
