@@ -1,4 +1,4 @@
-describe( 'jadeDom', function () {
+describe( 'jadeDom Features', function () {
 	var str;
 
 	describe( 'String Parsing', function () {
@@ -396,6 +396,19 @@ describe( 'jadeDom', function () {
 					expect( $elem.children( 'span:first' ).text() ).toBe( 'Robert' );
 				} );
 			} );
+
+            describe( 'Variable for inner text with =', function () {
+                var $elem = $.jade( { name: 'Robert' }, 'div#id= name' );
+                it( 'should be a div', function () {
+                    expect( $elem.is( 'div' ) ).toBe( true );
+                } );
+                it( 'should have an id of "id"', function () {
+                    expect( $elem.is( '#id' ) ).toBe( true );
+                } );
+                it( 'should contain the text "Robert"', function () {
+                    expect( $elem.text() ).toBe( 'Robert' );
+                } );
+            } );
 
 		} );
 

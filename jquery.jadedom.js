@@ -184,9 +184,12 @@
 						this.html = this.html.replace( new RegExp( '!\\{' + key + '\\}', 'g' ), this.parent.map[ key ] );
 					}
 				}
+                this.mode = true;
 			},
             'text_variable': function () {
                 var key = $.trim( this.str.substring( this.cur, this.len ) );
+                this.html = this.escape_html( this.parent.map[ key ] );
+                this.mode = true;
             }
 		},
 		escape_html: function ( str ) {
@@ -197,7 +200,7 @@
 			this.handle_mode[ this.mode ].apply( this );
 		},
 		parse: function () {
-			while ( this.cur < this.len && this.mode !== 'html' ) {
+			while ( this.cur < this.len && this.mode !== true ) {
 				if ( this.mode !== 'tag' ) this.char = this.str.charAt( this.cur++ );
 				if ( this.mode === false ) this.get_mode();
 				this.get_content();
