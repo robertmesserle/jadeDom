@@ -66,4 +66,60 @@ var $dom = $.jade( 'div.something', { cache: 'something' } ); // the div was cac
 var $something = $dom.jade( 'something' ); // something was pulled from cache by calling z() on the jadeDom object
  ```
 
- As you can see above, calling ```$dom.jade(str)``` on a jadeDom object will allow you to access any cached elements.  You can also access the full lookup table by calling ```$dom.jade()``` without any arguments.
+As you can see above, calling ```$dom.jade(str)``` on a jadeDom object will allow you to access any cached elements.  You can also access the full lookup table by calling ```$dom.jade()``` without any arguments.
+ 
+### Supported Jade Features
+ 
+#### ID's and Classes
+
+ID's and classes are set using CSS syntax - that is a ```#``` represents an ID and a ```.``` represents a class.
+
+```javascript
+$.jade( 'div#foo.bar.baz' );
+```
+
+```html
+<div id="foo" class="bar baz"></div>
+```
+
+#### Attributes
+
+Attributes in Jade are wrapped in ```()```.  You can have multiple attributes by separating them with a comma.  Both attribute names and values can optionally be wrapped in single or double quotes.
+
+```javascript
+$.jade( 'a(href=#, title="Foo")' );
+```
+
+```html
+<a href="#" title="Foo">Bar</a>
+```
+
+#### Tag Text
+
+Adding text to a tag can be accomplished by simply adding a space after the tag details and some text.
+
+```javascript
+$.jade( 'h1#foo.bar Baz' );
+```
+
+```html
+<h1 id="foo" class="bar">Baz</h1>
+```
+
+If you want to create a text node without having it be part of another tag, that can be accomplished by starting your string with a ```|```.
+
+```javascript
+$.jade(
+  'p', [
+    '| foo bar baz ',
+    '| rawr rawr ',
+    '| super cool ',
+    '| go jade go '
+  ]
+);
+```
+
+```html
+<p>foo bar baz rawr rawr super cool go jade go</p>
+```
+
