@@ -104,17 +104,17 @@
 		this.init();
 	}
 	JadeParser.prototype = {
-		mode_lookup: { '#': 'id', '.': 'class', '(': 'attributes', '|': 'html' },
+		mode_lookup: { '#': 'id', '.': 'class', '(': 'attributes', '|': 'html', '=': 'text_variable' },
 		cache: {},
 		init: function () {
 			if ( this.cache[ this.str ] ) {
-				this.elem = this.cache[ this.str ].cloneNode( false );
+				this.elem = this.cache[ this.str ].cloneNode( true );
 			} else if ( this.mode === 'html' ) {
 				this.elem = this.get_html_fragment( this.str.substring( 0, this.len ).replace( /^\|\s?/, '' ) );
 			} else {
 				this.parse();
 				this.create_element();
-				this.cache[ this.str ] = this.elem.cloneNode( false );
+				this.cache[ this.str ] = this.elem.cloneNode( true );
 			}
 		},
 		get_html_fragment: function ( str ) {
@@ -177,15 +177,17 @@
 				else if ( key = this.str.substring( this.cur ).match( /^\,\s*/ ) ) this.cur += key.length;
 			},
 			'html': function () {
-				this.html = this.str.substring( this.cur, this.len ).replace( /^\s+/, '' );
+				this.html = this.str.substring( this.cur, this.len ).replace( /^\s/, '' );
 				if ( this.parent.map !== false ) {
 					for ( var key in this.parent.map ) {
 						this.html = this.html.replace( new RegExp( '#\\{' + key + '\\}', 'g' ), this.escape_html( this.parent.map[ key ] ) );
 						this.html = this.html.replace( new RegExp( '!\\{' + key + '\\}', 'g' ), this.parent.map[ key ] );
 					}
 				}
-				this.str = this.str.substring( 0, this.cur );
-			}
+			},
+            'text_variable': function () {
+                var key = $.trim( this.str.substring( this.cur, this.len ) );
+            }
 		},
 		escape_html: function ( str ) {
 			return str.replace( /&/g, '&ampl;' ).replace( />/g, '&gt;' ).replace( /</g, '&lt;' ).replace( /"/g, '&quot;' );
