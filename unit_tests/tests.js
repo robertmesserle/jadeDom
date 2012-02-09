@@ -350,6 +350,22 @@ describe( 'jadeDom Features', function () {
 				} );
 			} );
 
+            describe( 'Variable for inner html with !=', function () {
+                var $elem = $.jade( { name: '<b>Robert</b>' }, 'div#id!= name' );
+                it( 'should be a div', function () {
+                    expect( $elem.is( 'div' ) ).toBe( true );
+                } );
+                it( 'should have an id of "id"', function () {
+                    expect( $elem.is( '#id' ) ).toBe( true );
+                } );
+                it( 'should have a child b tag', function () {
+                    expect( $elem.children( 'b' ).length ).toBeGreaterThan( 0 );
+                } );
+                it( 'should contain bold text "Robert"', function () {
+                    expect( $elem.html() ).toBe( '<b>Robert</b>' );
+                } );
+            } );
+
 		} );
 
 		describe( 'Escaped', function () {

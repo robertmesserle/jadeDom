@@ -104,7 +104,7 @@
 		this.init();
 	}
 	JadeParser.prototype = {
-		mode_lookup: { '#': 'id', '.': 'class', '(': 'attributes', '|': 'html', '=': 'text_variable' },
+		mode_lookup: { '#': 'id', '.': 'class', '(': 'attributes', '|': 'html', '=': 'text_variable', '!': 'html_variable' },
 		cache: {},
 		init: function () {
 			if ( this.cache[ this.str ] ) {
@@ -188,7 +188,13 @@
 			},
             'text_variable': function () {
                 var key = $.trim( this.str.substring( this.cur, this.len ) );
-                this.html = this.escape_html( this.parent.map[ key ] );
+                this.html = this.escape_html( this.parent.map[ key ] || key );
+                this.mode = true;
+            },
+            'html_variable': function () {
+                if ( this.str.charAt( this.cur ) !== '=' ) return;
+                var key = $.trim( this.str.substring( this.cur + 1, this.len ) );
+                this.html = this.parent.map[ key ] || key;
                 this.mode = true;
             }
 		},
