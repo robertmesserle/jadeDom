@@ -74,9 +74,13 @@ As you can see above, calling ```$dom.jade(str)``` on a jadeDom object will allo
 
 The tag is the first string specified in your Jade string.
 
+##### jadeDom
+
 ```javascript
 $.jade( 'div' );
 ```
+
+##### HTML
 
 ```html
 <div></div>
@@ -84,9 +88,13 @@ $.jade( 'div' );
 
 If you choose to omit the tag name, it will default to div.
 
+##### jadeDom
+
 ```javascript
 $.jade( '#foo.bar' );
 ```
+
+##### HTML
 
 ```html
 <div id="foo" class="bar"></div>
@@ -96,9 +104,13 @@ $.jade( '#foo.bar' );
 
 ID's and classes are set using CSS syntax - that is a ```#``` represents an ID and a ```.``` represents a class.
 
+##### jadeDom
+
 ```javascript
 $.jade( 'div#foo.bar.baz' );
 ```
+
+##### HTML
 
 ```html
 <div id="foo" class="bar baz"></div>
@@ -108,9 +120,13 @@ $.jade( 'div#foo.bar.baz' );
 
 Attributes in Jade are wrapped in ```()```.  You can have multiple attributes by separating them with a comma.  Both attribute names and values can optionally be wrapped in single or double quotes.
 
+##### jadeDom
+
 ```javascript
 $.jade( 'a(href=#, title="Foo")' );
 ```
+
+##### HTML
 
 ```html
 <a href="#" title="Foo">Bar</a>
@@ -120,15 +136,31 @@ $.jade( 'a(href=#, title="Foo")' );
 
 Adding text to a tag can be accomplished by simply adding a space after the tag details and some text.
 
+##### jadeDom
+
 ```javascript
 $.jade( 'h1#foo.bar Baz' );
 ```
+
+##### HTML
 
 ```html
 <h1 id="foo" class="bar">Baz</h1>
 ```
 
 If you want to create a text node without having it be part of another tag, that can be accomplished by starting your string with a ```|```.
+
+##### Jade
+
+```
+p
+  | foo bar baz
+  | rawr rawr
+  | super cool
+  | go jade go
+```
+
+##### jadeDom
 
 ```javascript
 $.jade(
@@ -141,6 +173,8 @@ $.jade(
 );
 ```
 
+##### HTML
+
 ```html
 <p>foo bar baz rawr rawr super cool go jade go</p>
 ```
@@ -152,6 +186,16 @@ Once you have passed in this lookup table, there are two ways to call a variable
 
 These will both do the same thing, but ```#{variable}``` will escape any HTML it finds while ```!{variable}``` will be rendered as HTML.
 
+##### Jade
+
+```
+ul
+  li Escaped: #{text}
+  li Unescaped: !{text}
+```
+
+##### jadeDom
+
 ```javascript
 $.jade( { text: '<b>Foobar</b>' },
   'ul', [
@@ -160,6 +204,8 @@ $.jade( { text: '<b>Foobar</b>' },
   ]
 );
 ```
+
+##### HTML
 
 ```html
 <ul>
