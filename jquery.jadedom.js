@@ -3,9 +3,10 @@
 
 	function jadeDom () {
 		this.lookup_table = {};
-		this.map = false;
+		this.locals = false;
 	}
 	jadeDom.prototype = {
+		globals: {},
 		init: function ( args ) {
 			var ret = this.add_children( false, args, true ),
 				$ret = $( ret );
@@ -17,7 +18,7 @@
 			return this.lookup_table[ str ] || false;
 		},
 		handle_object: function ( elem, obj ) {
-			if ( elem === false ) return this.map = obj;
+			if ( elem === false ) return this.locals = obj;
 			var $elem = $(elem), val;
 			for ( var key in obj ) {
 				val = obj[ key ];
@@ -178,23 +179,23 @@
 			},
 			'html': function () {
 				this.html = this.str.substring( this.cur, this.len ).replace( /^\s/, '' );
-				if ( this.parent.map !== false ) {
-					for ( var key in this.parent.map ) {
-						this.html = this.html.replace( new RegExp( '#\\{' + key + '\\}', 'g' ), this.escape_html( this.parent.map[ key ] ) );
-						this.html = this.html.replace( new RegExp( '!\\{' + key + '\\}', 'g' ), this.parent.map[ key ] );
+				if ( this.parent.locals !== false ) {
+					for ( var key in this.parent.locals ) {
+						this.html = this.html.replace( new RegExp( '#\\{' + key + '\\}', 'g' ), this.escape_html( this.parent.locals[ key ] ) );
+						this.html = this.html.replace( new RegExp( '!\\{' + key + '\\}', 'g' ), this.parent.locals[ key ] );
 					}
 				}
                 this.mode = true;
 			},
             'text_variable': function () {
                 var key = $.trim( this.str.substring( this.cur, this.len ) );
-                this.html = this.escape_html( this.parent.map[ key ] || key );
+                this.html = this.escape_html( this.parent.locals[ key ] || key );
                 this.mode = true;
             },
             'html_variable': function () {
                 if ( this.str.charAt( this.cur ) !== '=' ) return;
                 var key = $.trim( this.str.substring( this.cur + 1, this.len ) );
-                this.html = this.parent.map[ key ] || key;
+                this.html = this.parent.locals[ key ] || key;
                 this.mode = true;
             }
 		},

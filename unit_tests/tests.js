@@ -261,6 +261,23 @@ describe( 'jadeDom Features', function () {
 			} );
 		} );
 
+        describe( 'Text example from Jade documentation', function () {
+            var $elem = $.jade(
+                'p', [
+                    '| foo bar baz ',
+                    '| rawr rawr ',
+                    '| super cool ',
+                    '| go jade go '
+                ]
+            );
+            it( 'should be a p tag', function () {
+                expect( $elem.is( 'p' ) ).toBe( true );
+            } );
+            if( 'should contain the text "foo bar baz rawr rawr super cool go jade go"', function () {
+                expect( $elem.text() ).toBe( 'foo bar baz rawr rawr super cool go jade go' );
+            } );
+        } );
+
 		describe( 'Anchor tag with inline span and text as html', function () {
 			var $elem = $.jade(
 				'a.some_class(href=#, title=Some title)', [
