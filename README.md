@@ -213,3 +213,42 @@ $.jade( { text: '<b>Foobar</b>' },
   <li>Unescaped: <b>Foobar</b></li>
 </ul>
 ```
+
+You can also utilize *global* variables.  *Local* variables (as in the example above) will override anything present in jadeDom's global variables.
+
+Globals are managed with the following 3 functions:
+
+**$.jade.set_globals( object )**: This is used to set the globals object, overwriting anything currently present.  
+**$.jade.add_globals( object )**: This will extend the existing globals object with any values passed in.  
+**$.jade.clear_globals()**: This will empty the globals object.
+
+##### Jade
+
+```javascript
+$.jade.set_globals( { foo: 'bar', bar: 'baz' } );
+$.jade( 'p foo is !{foo}, while bar is !{bar}.' );
+$.jade( { foo: 'not bar' }, 'p foo is !{foo}, while bar is !{bar}.' );
+
+$.jade.update_globals( { foo: 'not bar' } );
+$.jade( 'p foo is !{foo}, while bar is !{bar}.' );
+
+$.jade.clear_globals();
+$.jade( 'p foo is !{foo}, while bar is !{bar}.' );
+```
+
+##### HTML
+
+```html
+<p>foo is bar, while bar is baz</p>
+<p>foo is not bar, while bar is baz</p>
+<p>foo is not bar, while bar is baz</p>
+<p>foo is !{foo}, while bar is !{bar}</p>
+```
+
+The first line demonstrates basic globals replacement.
+
+In the second line, the global variable 'foo' is still set, but is overridden by the local variable 'foo.'
+
+In the third line, the globals object is updated so that foo is 'not bar.'
+
+In the last line, no replacement occurs since the globals object has been cleared and no locals were passed in.
