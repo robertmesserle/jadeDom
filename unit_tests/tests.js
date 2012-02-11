@@ -158,6 +158,44 @@ describe( 'jadeDom Features', function () {
 				expect( $elem.attr( 'title' ) ).toBe( 'title with spaces in it, as well as commas' );
 			} );
 		} );
+
+		describe( 'img(src=/img/portfolio/center_bg.png, alt="", width=1000, height=400)', function () {
+			var $elem = $.jade( 'img(src=/img/portfolio/center_bg.png, alt="", width=1000, height=400)' );
+			it( 'should be an img', function () {
+				expect( $elem.is( 'img' ) ).toBe( true );
+			} );
+			it( 'should have a src of /img/portfolio/center_bg.png', function () {
+				expect( $elem.attr( 'src' ) ).toBe( '/img/portfolio/center_bg.png' );
+			} );
+			it( 'should have an alt of ""', function () {
+				expect( $elem.attr( 'alt' ) ).toBe( '' );
+			} );
+			it( 'should have a width of 1000', function () {
+				expect( $elem.attr( 'width' ) ).toBe( '1000' );
+			} );
+			it( 'should have a height of 400', function () {
+				expect( $elem.attr( 'height' ) ).toBe( '400' );
+			} );
+		} );
+
+		describe( 'img(src=!{src}, alt="", width=1000, height=400)', function () {
+			var $elem = $.jade( { src: '/img/portfolio/center_bg.png' }, 'img(src=!{src}, alt="", width=1000, height=400)' );
+			it( 'should be an img', function () {
+				expect( $elem.is( 'img' ) ).toBe( true );
+			} );
+			it( 'should have a src of /img/portfolio/center_bg.png', function () {
+				expect( $elem.attr( 'src' ) ).toBe( '/img/portfolio/center_bg.png' );
+			} );
+			it( 'should have an alt of ""', function () {
+				expect( $elem.attr( 'alt' ) ).toBe( '' );
+			} );
+			it( 'should have a width of 1000', function () {
+				expect( $elem.attr( 'width' ) ).toBe( '1000' );
+			} );
+			it( 'should have a height of 400', function () {
+				expect( $elem.attr( 'height' ) ).toBe( '400' );
+			} );
+		} );
 	} );
 
 	describe( 'Nesting', function () {
@@ -582,6 +620,56 @@ describe( 'jadeDom Features', function () {
 				var str = 'div!= name';
 				expect( $.jade( { name: 'Foo' }, str ).text() ).toBe( 'Foo' );
 				expect( $.jade( { name: 'Bar' }, str ).text() ).toBe( 'Bar' );
+			} );
+
+		} );
+
+	} );
+
+	describe( 'Loops and Logic', function () {
+
+		describe( '$.jade.when()', function () {
+
+			var $true = $.jade.when( true, 'div.true' ),
+				$false = $.jade.when( false, 'div.false' ),
+				$nest = $.jade(
+					'div.wrapper', [
+						$.jade.when( true, 'div.moose' ),
+						$.jade.when( false, 'div.mouse' )
+					]
+				);
+
+			it( 'should return the contents when the condition is true', function () {
+				expect( $true.is( 'div.true' ) ).toBe( true );
+			} );
+
+			it( 'should return an empty string when the condition is false', function () {
+				expect( $false ).toBe( '' );
+			} );
+
+			it( 'should work when nested in another $.jade() call', function () {
+				expect( $nest.is( 'div.wrapper' ) ).toBe( true );
+				expect( $nest.children( 'div.moose' ).length ).toBeGreaterThan( 0 );
+				expect( $nest.children( 'div.mouse' ).length ).toBe( 0 );
+			} );
+
+		} );
+
+		describe( '$.jade.each()', function () {
+
+			describe( 'Nested', function () {
+				var data = [ { url: 'http:/www.google.com', name: 'Google' }, { url: 'http://www.youtube.com', name: 'YouTube' } ],
+					$elem = $.jade(
+					'div.wrapper', [
+						$.jade.each( data, 'a(href=!{url}) #{name}' )
+					]
+				);
+				it( 'should be a div with a class of wrapper', function () {
+					expect( $elem.is( 'div.wrapper' ) ).toBe( true );
+				} );
+				it( 'should have 2 children', function () {
+					expect( $elem.children().length ).toBe( 2 );
+				} );
 			} );
 
 		} );

@@ -231,6 +231,7 @@
 		var jade = new JadeDom();
 		return jade.init( Array.apply( null, arguments ) );
 	};
+	//-- manage globals
 	$.jade.set_globals = function ( obj ) {
 		JadeDom.prototype.globals = obj;
 	};
@@ -239,6 +240,27 @@
 	};
 	$.jade.clear_globals = function () {
 		JadeDom.prototype.globals = {};
+	};
+	//-- loops and logic
+	$.jade.when = function () {
+		var args = Array.apply( null, arguments ),
+			condition = args.shift();
+		return condition ? $.jade.apply( null, args ) : '';
+	};
+	$.jade.each = function () {
+		console.log( arguments );
+		var args = Array.apply( null, arguments ),
+			arr  = args.shift(),
+			len  = arr.length,
+			frag, i, temp;
+		if ( len === 1 ) return $.jade.apply( null, args );
+		frag = document.createDocumentFragment();
+		for ( i = 0; i < len; i++ ) {
+			temp = [ arr[ i ] ];
+			temp.push.apply( temp, args );
+			frag.appendChild( $.jade.apply( null, temp ).get( 0 ) );
+		}
+		return $( frag );
 	};
 
 	//-- for debugging purposes
