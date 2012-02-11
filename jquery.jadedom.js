@@ -3,12 +3,11 @@
 
 	'use strict';
 
-	function JadeDom () {
-		this.lookup_table = {};
-		this.locals = {};
-	}
+	function JadeDom () {}
 	JadeDom.prototype = {
 		globals: {},
+		locals: {},
+		lookup_table: {},
 		init: function ( args ) {
 			var ret = this.add_children( false, args, true ),
 				$ret = $( ret );
@@ -57,7 +56,7 @@
 				type = this.get_type( child );
 				switch ( type ) {
 					case 'node':
-						if ( top_level && elem !== false ) ( elem = document.createDocumentFragment() ).appendChild( last_elem );   // switch to fragment if necessary
+						if ( top_level && elem && elem === last_elem ) ( elem = document.createDocumentFragment() ).appendChild( last_elem );   // switch to fragment if necessary
 						last_elem = this.get_node( child );         // get node and store it in last_elem
 						if ( elem === false ) elem = last_elem;     // if there is no root elem yet, set it to last_elem
 						else elem.appendChild( last_elem );         // otherwise, append it to the existing node

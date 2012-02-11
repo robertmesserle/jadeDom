@@ -318,6 +318,22 @@ describe( 'jadeDom Features', function () {
 			} );
 		} );
 
+		describe( 'Multiple root level elements', function () {
+
+			it( 'should support 3 root level elements', function () {
+				var $wrapper = $.jade( 'div' );
+				$wrapper.html( $.jade(
+					$('<div class="first" />'),
+					'div.second',
+					'div.third'
+				) );
+				expect( $wrapper.children( ':first' ).is( 'div.first' ) ).toBe( true );
+				expect( $wrapper.children( 'div.second' ).length ).toBeGreaterThan( 0 );
+				expect( $wrapper.children( ':last' ).is( 'div.third' ) ).toBe( true );
+			} );
+
+		} );
+
 	} );
 
 	describe( 'Variable Replacement', function () {
