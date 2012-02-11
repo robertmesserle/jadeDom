@@ -109,6 +109,7 @@
 	JadeParser.prototype = {
 		mode_lookup: { '#': 'id', '.': 'class', '(': 'attributes', '|': 'html', '=': 'text_variable', '!': 'html_variable' },
 		cache: {},
+		skip_cache: false,
 		init: function () {
 			this.variable_replacement();
 			if ( this.cache[ this.str ] ) {
@@ -118,7 +119,7 @@
 			} else {
 				this.parse();
 				this.create_element();
-				this.cache[ this.str ] = this.elem.cloneNode( true );
+				if ( !this.skip_cache ) this.cache[ this.str ] = this.elem.cloneNode( true );
 			}
 		},
 		get_html_fragment: function ( str ) {
@@ -188,12 +189,15 @@
                 var key = $.trim( this.str.substring( this.cur, this.len ) );
                 this.html = this.escape_html( this.parent.locals[ key ] || this.parent.globals[ key ] || key );
                 this.mode = true;
+	            this.str = false;
+	            this.skip_cache = true;
             },
             'html_variable': function () {
                 if ( this.str.charAt( this.cur ) !== '=' ) return;
                 var key = $.trim( this.str.substring( this.cur + 1, this.len ) );
                 this.html = this.parent.locals[ key ] || this.parent.globals[ key ] || key;
                 this.mode = true;
+	            this.skip_cache = true;
             }
 		},
 		variable_replacement: function () {

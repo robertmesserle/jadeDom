@@ -562,4 +562,30 @@ describe( 'jadeDom Features', function () {
 
 	} );
 
+	describe( 'DOM Element Caching', function () {
+
+		describe( 'Caching with variable substitution', function () {
+
+			it( 'should not cache the string until after substitution has occurred', function () {
+				var str = 'div !{name}';
+				expect( $.jade( { name: 'Foo' }, str ).text() ).toBe( 'Foo' );
+				expect( $.jade( { name: 'Bar' }, str ).text() ).toBe( 'Bar' );
+			} );
+
+			it( 'should not cache the tag when = is used to set string contents', function () {
+				var str = 'div= name';
+				expect( $.jade( { name: 'Foo' }, str ).text() ).toBe( 'Foo' );
+				expect( $.jade( { name: 'Bar' }, str ).text() ).toBe( 'Bar' );
+			} );
+
+			it( 'should not cache the tag when != is used to set string contents', function () {
+				var str = 'div!= name';
+				expect( $.jade( { name: 'Foo' }, str ).text() ).toBe( 'Foo' );
+				expect( $.jade( { name: 'Bar' }, str ).text() ).toBe( 'Bar' );
+			} );
+
+		} );
+
+	} );
+
 } );
