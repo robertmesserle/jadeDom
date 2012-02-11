@@ -1,11 +1,13 @@
 /*! jadeDom v1.0 by Robert Messerle  |  https://github.com/robertmesserle/jadeDom */
 ( function ( $ ) {
 
-	function jadeDom () {
+	'use strict';
+
+	function JadeDom () {
 		this.lookup_table = {};
-		this.locals = false;
+		this.locals = {};
 	}
-	jadeDom.prototype = {
+	JadeDom.prototype = {
 		globals: {},
 		init: function ( args ) {
 			var ret = this.add_children( false, args, true ),
@@ -108,6 +110,7 @@
 		mode_lookup: { '#': 'id', '.': 'class', '(': 'attributes', '|': 'html', '=': 'text_variable', '!': 'html_variable' },
 		cache: {},
 		init: function () {
+			this.variable_replacement();
 			if ( this.cache[ this.str ] ) {
 				this.elem = this.cache[ this.str ].cloneNode( true );
 			} else if ( this.mode === 'html' ) {
@@ -179,25 +182,30 @@
 			},
 			'html': function () {
 				this.html = this.str.substring( this.cur, this.len ).replace( /^\s/, '' );
-				if ( this.parent.locals !== false ) {
-					for ( var key in this.parent.locals ) {
-						this.html = this.html.replace( new RegExp( '#\\{' + key + '\\}', 'g' ), this.escape_html( this.parent.locals[ key ] ) );
-						this.html = this.html.replace( new RegExp( '!\\{' + key + '\\}', 'g' ), this.parent.locals[ key ] );
-					}
-				}
                 this.mode = true;
 			},
             'text_variable': function () {
                 var key = $.trim( this.str.substring( this.cur, this.len ) );
-                this.html = this.escape_html( this.parent.locals[ key ] || key );
+                this.html = this.escape_html( this.parent.locals[ key ] || this.parent.globals[ key ] || key );
                 this.mode = true;
             },
             'html_variable': function () {
                 if ( this.str.charAt( this.cur ) !== '=' ) return;
                 var key = $.trim( this.str.substring( this.cur + 1, this.len ) );
-                this.html = this.parent.locals[ key ] || key;
+                this.html = this.parent.locals[ key ] || this.parent.globals[ key ] || key;
                 this.mode = true;
             }
+		},
+		variable_replacement: function () {
+			this.replace( this.parent.locals );
+			this.replace( this.parent.globals );
+			this.len = this.str.length - 1;
+		},
+		replace: function ( map ) {
+			for ( var key in map ) {
+				this.str = this.str.replace( new RegExp( '#\\{' + key + '\\}', 'g' ), this.escape_html( map[ key ] ) );
+				this.str = this.str.replace( new RegExp( '!\\{' + key + '\\}', 'g' ), map[ key ] );
+			}
 		},
 		escape_html: function ( str ) {
 			return str.replace( /&/g, '&ampl;' ).replace( />/g, '&gt;' ).replace( /</g, '&lt;' ).replace( /"/g, '&quot;' );
@@ -216,8 +224,23 @@
 	};
 
 	$.jade = function () {
-		var jade = new jadeDom();
+		var jade = new JadeDom();
 		return jade.init( Array.apply( null, arguments ) );
+	};
+	$.jade.set_globals = function ( obj ) {
+		JadeDom.prototype.globals = obj;
+	};
+	$.jade.add_globals = function ( obj ) {
+		$.extend( JadeDom.prototype.globals, obj );
+	};
+	$.jade.clear_globals = function () {
+		JadeDom.prototype.globals = {};
+	};
+
+	//-- for debugging purposes
+	$._jade = {
+		main: JadeDom,
+		parser: JadeParser
 	};
 
 } )( jQuery );

@@ -322,126 +322,191 @@ describe( 'jadeDom Features', function () {
 
 	describe( 'Variable Replacement', function () {
 
-		describe( 'Unescaped', function () {
+		describe( 'Locals', function () {
 
-			describe( 'Basic token replacement', function () {
-				var $elem = $.jade( { name: '<b>Robert</b>' }, 'h1#welcome Hello !{name}!' );
-				it( 'should be an h1 tag', function () {
-					expect( $elem.is( 'h1' ) ).toBe( true );
+			describe( 'Unescaped', function () {
+
+				describe( 'Basic token replacement', function () {
+					var $elem = $.jade( { name: '<b>Robert</b>' }, 'h1#welcome Hello !{name}!' );
+					it( 'should be an h1 tag', function () {
+						expect( $elem.is( 'h1' ) ).toBe( true );
+					} );
+					it( 'should say, "Hello Robert!"', function () {
+						expect( $elem.text() ).toBe( 'Hello Robert!' );
+					} );
+					it( 'should have "Robert" bolded', function () {
+						expect( $elem.html() ).toBe( 'Hello <b>Robert</b>!' );
+					} );
 				} );
-				it( 'should say, "Hello Robert!"', function () {
-					expect( $elem.text() ).toBe( 'Hello Robert!' );
+
+				describe( 'Token replacement with multiple instances of the same token', function () {
+					var $elem = $.jade( { name: 'Robert' }, 'h1#hello Hello #{name}!  Your name is !{name}!' );
+					it( 'should be an h1 tag', function () {
+						expect( $elem.is( 'h1' ) ).toBe( true );
+					} );
+					it( 'should say "Hello Robert!  Your name is Robert!', function () {
+						expect( $elem.text() ).toBe( 'Hello Robert!  Your name is Robert!' );
+					} );
 				} );
-				it( 'should have "Robert" bolded', function () {
-					expect( $elem.html() ).toBe( 'Hello <b>Robert</b>!' );
+
+				describe( 'Token replacement with nested DOM elements.', function () {
+					var $elem = $.jade( { name: 'Robert' },
+						'h1#name !{name} ', [
+							'span !{name}'
+						]
+					);
+					it( 'should say "Robert Robert"', function () {
+						expect( $elem.text() ).toBe( 'Robert Robert' );
+					} );
+					it( 'should be an h1 tag', function () {
+						expect( $elem.is( 'h1' ) ).toBe( true );
+					} );
+					it( 'should have a child span tag', function () {
+						expect( $elem.children( 'span' ).length ).toBeGreaterThan( 0 );
+					} );
+					it( 'should have a child span tag with the text "Robert"', function () {
+						expect( $elem.children( 'span:first' ).text() ).toBe( 'Robert' );
+					} );
 				} );
+
+	            describe( 'Variable for inner html with !=', function () {
+	                var $elem = $.jade( { name: '<b>Robert</b>' }, 'div#id!= name' );
+	                it( 'should be a div', function () {
+	                    expect( $elem.is( 'div' ) ).toBe( true );
+	                } );
+	                it( 'should have an id of "id"', function () {
+	                    expect( $elem.is( '#id' ) ).toBe( true );
+	                } );
+	                it( 'should have a child b tag', function () {
+	                    expect( $elem.children( 'b' ).length ).toBeGreaterThan( 0 );
+	                } );
+	                it( 'should contain bold text "Robert"', function () {
+	                    expect( $elem.html() ).toBe( '<b>Robert</b>' );
+	                } );
+	            } );
+
 			} );
 
-			describe( 'Token replacement with multiple instances of the same token', function () {
-				var $elem = $.jade( { name: 'Robert' }, 'h1#hello Hello #{name}!  Your name is !{name}!' );
-				it( 'should be an h1 tag', function () {
-					expect( $elem.is( 'h1' ) ).toBe( true );
-				} );
-				it( 'should say "Hello Robert!  Your name is Robert!', function () {
-					expect( $elem.text() ).toBe( 'Hello Robert!  Your name is Robert!' );
-				} );
-			} );
+			describe( 'Escaped', function () {
 
-			describe( 'Token replacement with nested DOM elements.', function () {
-				var $elem = $.jade( { name: 'Robert' },
-					'h1#name !{name} ', [
-						'span !{name}'
-					]
-				);
-				it( 'should say "Robert Robert"', function () {
-					expect( $elem.text() ).toBe( 'Robert Robert' );
+				describe( 'Basic token replacement', function () {
+					var $elem = $.jade( { name: '<b>Robert</b>' }, 'h1#welcome Hello #{name}!' );
+					it( 'should be an h1 tag', function () {
+						expect( $elem.is( 'h1' ) ).toBe( true );
+					} );
+					it( 'should say, "Hello Robert!"', function () {
+						expect( $elem.text() ).toBe( 'Hello <b>Robert</b>!' );
+					} );
+					it( 'should have escaped the bold tag', function () {
+						expect( $elem.html() ).toBe( 'Hello &lt;b&gt;Robert&lt;/b&gt;!' );
+					} );
 				} );
-				it( 'should be an h1 tag', function () {
-					expect( $elem.is( 'h1' ) ).toBe( true );
-				} );
-				it( 'should have a child span tag', function () {
-					expect( $elem.children( 'span' ).length ).toBeGreaterThan( 0 );
-				} );
-				it( 'should have a child span tag with the text "Robert"', function () {
-					expect( $elem.children( 'span:first' ).text() ).toBe( 'Robert' );
-				} );
-			} );
 
-            describe( 'Variable for inner html with !=', function () {
-                var $elem = $.jade( { name: '<b>Robert</b>' }, 'div#id!= name' );
-                it( 'should be a div', function () {
-                    expect( $elem.is( 'div' ) ).toBe( true );
-                } );
-                it( 'should have an id of "id"', function () {
-                    expect( $elem.is( '#id' ) ).toBe( true );
-                } );
-                it( 'should have a child b tag', function () {
-                    expect( $elem.children( 'b' ).length ).toBeGreaterThan( 0 );
-                } );
-                it( 'should contain bold text "Robert"', function () {
-                    expect( $elem.html() ).toBe( '<b>Robert</b>' );
-                } );
-            } );
+				describe( 'Token replacement with multiple instances of the same token', function () {
+					var $elem = $.jade( { name: 'Robert' }, 'h1#hello Hello #{name}!  Your name is #{name}!' );
+					it( 'should be an h1 tag', function () {
+						expect( $elem.is( 'h1' ) ).toBe( true );
+					} );
+					it( 'should say "Hello Robert!  Your name is Robert!', function () {
+						expect( $elem.text() ).toBe( 'Hello Robert!  Your name is Robert!' );
+					} );
+				} );
+
+				describe( 'Token replacement with nested DOM elements.', function () {
+					var $elem = $.jade( { name: 'Robert' },
+						'h1#name #{name} ', [
+							'span #{name}'
+						]
+					);
+					it( 'should say "Robert Robert"', function () {
+						expect( $elem.text() ).toBe( 'Robert Robert' );
+					} );
+					it( 'should be an h1 tag', function () {
+						expect( $elem.is( 'h1' ) ).toBe( true );
+					} );
+					it( 'should have a child span tag', function () {
+						expect( $elem.children( 'span' ).length ).toBeGreaterThan( 0 );
+					} );
+					it( 'should have a child span tag with the text "Robert"', function () {
+						expect( $elem.children( 'span:first' ).text() ).toBe( 'Robert' );
+					} );
+				} );
+
+	            describe( 'Variable for inner text with =', function () {
+	                var $elem = $.jade( { name: 'Robert' }, 'div#id= name' );
+	                it( 'should be a div', function () {
+	                    expect( $elem.is( 'div' ) ).toBe( true );
+	                } );
+	                it( 'should have an id of "id"', function () {
+	                    expect( $elem.is( '#id' ) ).toBe( true );
+	                } );
+	                it( 'should contain the text "Robert"', function () {
+	                    expect( $elem.text() ).toBe( 'Robert' );
+	                } );
+	            } );
+
+			} );
 
 		} );
 
-		describe( 'Escaped', function () {
+		describe( 'Globals', function () {
 
-			describe( 'Basic token replacement', function () {
-				var $elem = $.jade( { name: '<b>Robert</b>' }, 'h1#welcome Hello #{name}!' );
-				it( 'should be an h1 tag', function () {
-					expect( $elem.is( 'h1' ) ).toBe( true );
+			describe( '$.jade.set_globals', function () {
+
+				it( 'should set the globals object', function () {
+					$.jade.set_globals( { foo: 'bar' } );
+					expect( $._jade.main.prototype.globals.foo ).toBe( 'bar' );
 				} );
-				it( 'should say, "Hello Robert!"', function () {
-					expect( $elem.text() ).toBe( 'Hello <b>Robert</b>!' );
-				} );
-				it( 'should have escaped the bold tag', function () {
-					expect( $elem.html() ).toBe( 'Hello &lt;b&gt;Robert&lt;/b&gt;!' );
-				} );
+
 			} );
 
-			describe( 'Token replacement with multiple instances of the same token', function () {
-				var $elem = $.jade( { name: 'Robert' }, 'h1#hello Hello #{name}!  Your name is #{name}!' );
-				it( 'should be an h1 tag', function () {
-					expect( $elem.is( 'h1' ) ).toBe( true );
+			describe( '$.jade.add_globals', function () {
+
+				it( 'should extend the existing object with any new properties', function () {
+					$.jade.add_globals( { bar: 'baz' } );
+					expect( $._jade.main.prototype.globals.foo ).toBe( 'bar' );
+					expect( $._jade.main.prototype.globals.bar ).toBe( 'baz' );
 				} );
-				it( 'should say "Hello Robert!  Your name is Robert!', function () {
-					expect( $elem.text() ).toBe( 'Hello Robert!  Your name is Robert!' );
-				} );
+
 			} );
 
-			describe( 'Token replacement with nested DOM elements.', function () {
-				var $elem = $.jade( { name: 'Robert' },
-					'h1#name #{name} ', [
-						'span #{name}'
-					]
-				);
-				it( 'should say "Robert Robert"', function () {
-					expect( $elem.text() ).toBe( 'Robert Robert' );
+			describe( '$.jade.clear_globals', function () {
+
+				it( 'should clear the globals object', function () {
+					$.jade.clear_globals();
+					var i = false;
+					for ( var i in $._jade.main.prototype.globals );
+					expect( i ).toBe( false );
 				} );
-				it( 'should be an h1 tag', function () {
-					expect( $elem.is( 'h1' ) ).toBe( true );
-				} );
-				it( 'should have a child span tag', function () {
-					expect( $elem.children( 'span' ).length ).toBeGreaterThan( 0 );
-				} );
-				it( 'should have a child span tag with the text "Robert"', function () {
-					expect( $elem.children( 'span:first' ).text() ).toBe( 'Robert' );
-				} );
+
 			} );
 
-            describe( 'Variable for inner text with =', function () {
-                var $elem = $.jade( { name: 'Robert' }, 'div#id= name' );
-                it( 'should be a div', function () {
-                    expect( $elem.is( 'div' ) ).toBe( true );
-                } );
-                it( 'should have an id of "id"', function () {
-                    expect( $elem.is( '#id' ) ).toBe( true );
-                } );
-                it( 'should contain the text "Robert"', function () {
-                    expect( $elem.text() ).toBe( 'Robert' );
-                } );
-            } );
+			describe( 'Global Replacement', function () {
+				$.jade.set_globals( { foo: 'bar', bar: 'baz' } );
+
+				describe( 'Globals: p foo is !{foo}, while bar is #{bar}.', function () {
+					var $elem = $.jade( 'p foo is !{foo}, while bar is #{bar}.' );
+					it( 'should be a p tag', function () {
+						expect( $elem.is( 'p' ) ).toBe( true );
+					} );
+					it( 'should replace foo and bar from globals', function () {
+						expect( $elem.text() ).toBe( 'foo is bar, while bar is baz.' );
+					} );
+				} );
+
+				describe( 'Mixed: p foo is !{foo}, while bar is #{bar}.', function () {
+					var $elem = $.jade( { foo: 'not bar' },
+						'p foo is !{foo}, while bar is #{bar}.'
+					);
+					it( 'should be a p tag', function () {
+						expect( $elem.is( 'p' ) ).toBe( true );
+					} );
+					it( 'should override globals with locals when performing replacement', function () {
+						expect( $elem.text() ).toBe( 'foo is not bar, while bar is baz.' );
+					} );
+				} );
+
+			} );
 
 		} );
 
