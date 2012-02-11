@@ -3,11 +3,12 @@
 
 	'use strict';
 
-	function JadeDom () {}
+	function JadeDom () {
+		this.lookup_table = {};
+	}
 	JadeDom.prototype = {
 		globals: {},
 		locals: {},
-		lookup_table: {},
 		init: function ( args ) {
 			var ret = this.add_children( false, args, true ),
 				$ret = $( ret );
