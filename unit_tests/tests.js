@@ -926,6 +926,20 @@ describe( 'jadeDom Features', function () {
 
 		describe( 'else()', function () {
 
+			var $elem = $.jade( { foo: 'bar' },
+				'div.wrapper', [
+					'- if ( foo == "bar" )', [ 'div.if If' ],
+					'- else', [ 'div.else Else' ]
+				]
+			);
+
+			it( 'should have div.if', function () {
+				expect( $elem.find( 'div.if' ).length ).toBe( 1 );
+			} );
+			it( 'should not have div.else', function () {
+				expect( $elem.find( 'div.else' ).length ).toBe( 0 );
+			} );
+
 		} );
 
 	} );

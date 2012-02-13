@@ -91,7 +91,8 @@
 		},
 		handle_logic: function ( str ) {
 			var parts;
-			if ( parts = str.match( /-\s*if[\s\(]+([\w\d_'"]+)(\s*((==)|(>=)|(<=)|(<)|(>)|(===)|(!==)|(!=))\s*([\w\d_'"])+)?[\s\)]*/ ) ) return this.logic = this.handle_if( parts.slice( 1 ) );
+			if ( parts = str.match( /^-\s*if[\s\(]+([\w\d_'"]+)(\s*((==)|(>=)|(<=)|(<)|(>)|(===)|(!==)|(!=))\s*([\w\d_'"])+)?[\s\)]*$/ ) ) return this.logic = this.handle_if( parts.slice( 1 ) );
+			if ( str.match( /^-\s*else\s*$/ ) ) return this.logic = !this.last_logic;
 		},
 		remove_undefined: function ( parts ) {
 			for ( var i = parts.length; i--; ) if ( typeof parts[ i ] === 'undefined' ) parts.splice( i, 1 );
