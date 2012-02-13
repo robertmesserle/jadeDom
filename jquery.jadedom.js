@@ -122,23 +122,6 @@
 				if ( !this.skip_cache ) this.cache[ this.str ] = this.elem.cloneNode( true );
 			}
 		},
-		get_html_fragment: function ( str ) {
-			var frag = document.createDocumentFragment(),
-				div  = document.createElement( 'div' ),
-				i;
-			div.innerHTML = str;
-			i = div.childNodes.length;
-			while ( i-- ) frag.appendChild( div.childNodes[ 0 ] );
-			return frag;
-		},
-		get_first_mode: function () {
-			var char = this.str.charAt( 0 );
-			return char === '|' ? 'html' : char.match( /\w/ ) ? 'tag' : false;
-		},
-		jump_to_next: function ( len ) {
-			this.mode = false;
-			this.cur += len;
-		},
 		create_element: function () {
 			this.elem = document.createElement( this.tag || 'div' );
 			if ( this.id ) this.elem.id = this.id;
@@ -146,23 +129,30 @@
 			if ( this.attrs ) this.parent.set_attributes( this.elem, this.attrs );
 			if ( this.html[ 0 ] ) this.elem.innerHTML = this.html;
 		},
+		escape_html: function ( str ) {
+			return str.replace( /&/g, '&ampl;' ).replace( />/g, '&gt;' ).replace( /</g, '&lt;' ).replace( /"/g, '&quot;' );
+		},
+		get_content: function () {
+			if ( this.mode === false ) return;
+			this.handle_mode[ this.mode ].apply( this );
+		},
+		get_first_mode: function () {
+			var char = this.str.charAt( 0 );
+			return char === '|' ? 'html' : char.match( /\w/ ) ? 'tag' : false;
+		},
+		get_html_fragment: function ( str ) {
+			var frag = document.createDocumentFragment(),
+					div  = document.createElement( 'div' ),
+					i;
+			div.innerHTML = str;
+			i = div.childNodes.length;
+			while ( i-- ) frag.appendChild( div.childNodes[ 0 ] );
+			return frag;
+		},
 		get_mode: function () {
 			this.mode = this.char.match( /\s/ ) ? 'html' : this.mode_lookup[ this.char ] || false;
 		},
 		handle_mode: {
-			'tag': function () {
-				this.tag = this.str.substring( this.cur ).match( /^[\w\d\:\_\-]+/ )[ 0 ] || 'div';
-				this.jump_to_next( this.tag.length );
-			},
-			'class': function () {
-				var cls = this.str.substring( this.cur ).match( /^[\w\d\:\_\-]+/ )[ 0 ];
-				this.classes.push( cls );
-				this.jump_to_next( cls.length );
-			},
-			'id': function () {
-				this.id = this.str.substring( this.cur ).match( /^[\w\d\:\_\-]+/ )[ 0 ];
-				this.jump_to_next( this.id.length );
-			},
 			'attributes': function () {
 				var key, val;
 				if ( this.attrs === false ) this.attrs = {};
@@ -181,42 +171,41 @@
 				else if ( this.str.charAt( this.cur ) === ')' ) this.mode = false;
 				else if ( key = this.str.substring( this.cur ).match( /^\,\s*/ ) ) this.cur += key.length;
 			},
+			'class': function () {
+				var cls = this.str.substring( this.cur ).match( /^[\w\d\:\_\-]+/ )[ 0 ];
+				this.classes.push( cls );
+				this.jump_to_next( cls.length );
+			},
 			'html': function () {
 				this.html = this.str.substring( this.cur, this.len ).replace( /^\s/, '' );
-                this.mode = true;
+				this.mode = true;
 			},
-            'text_variable': function () {
-                var key = $.trim( this.str.substring( this.cur, this.len ) );
-                this.html = this.escape_html( this.parent.locals[ key ] || this.parent.globals[ key ] || key );
-                this.mode = true;
-	            this.str = false;
-	            this.skip_cache = true;
-            },
-            'html_variable': function () {
-                if ( this.str.charAt( this.cur ) !== '=' ) return;
-                var key = $.trim( this.str.substring( this.cur + 1, this.len ) );
-                this.html = this.parent.locals[ key ] || this.parent.globals[ key ] || key;
-                this.mode = true;
-	            this.skip_cache = true;
-            }
-		},
-		variable_replacement: function () {
-			this.replace( this.parent.locals );
-			this.replace( this.parent.globals );
-			this.len = this.str.length - 1;
-		},
-		replace: function ( map ) {
-			for ( var key in map ) {
-				this.str = this.str.replace( new RegExp( '#\\{' + key + '\\}', 'g' ), this.escape_html( map[ key ] ) );
-				this.str = this.str.replace( new RegExp( '!\\{' + key + '\\}', 'g' ), map[ key ] );
+			'html_variable': function () {
+				if ( this.str.charAt( this.cur ) !== '=' ) return;
+				var key = $.trim( this.str.substring( this.cur + 1, this.len ) );
+				this.html = this.parent.locals[ key ] || this.parent.globals[ key ] || key;
+				this.mode = true;
+				this.skip_cache = true;
+			},
+			'id': function () {
+				this.id = this.str.substring( this.cur ).match( /^[\w\d\:\_\-]+/ )[ 0 ];
+				this.jump_to_next( this.id.length );
+			},
+			'tag': function () {
+				this.tag = this.str.substring( this.cur ).match( /^[\w\d\:\_\-]+/ )[ 0 ] || 'div';
+				this.jump_to_next( this.tag.length );
+			},
+			'text_variable': function () {
+				var key = $.trim( this.str.substring( this.cur, this.len ) );
+				this.html = this.escape_html( this.parent.locals[ key ] || this.parent.globals[ key ] || key );
+				this.mode = true;
+				this.str = false;
+				this.skip_cache = true;
 			}
 		},
-		escape_html: function ( str ) {
-			return str.replace( /&/g, '&ampl;' ).replace( />/g, '&gt;' ).replace( /</g, '&lt;' ).replace( /"/g, '&quot;' );
-		},
-		get_content: function () {
-			if ( this.mode === false ) return;
-			this.handle_mode[ this.mode ].apply( this );
+		jump_to_next: function ( len ) {
+			this.mode = false;
+			this.cur += len;
 		},
 		parse: function () {
 			while ( this.cur < this.len && this.mode !== true ) {
@@ -224,6 +213,17 @@
 				if ( this.mode === false ) this.get_mode();
 				this.get_content();
 			}
+		},
+		replace: function ( map ) {
+			for ( var key in map ) {
+				this.str = this.str.replace( new RegExp( '#\\{' + key + '\\}', 'g' ), this.escape_html( map[ key ] ) );
+				this.str = this.str.replace( new RegExp( '!\\{' + key + '\\}', 'g' ), map[ key ] );
+			}
+		},
+		variable_replacement: function () {
+			this.replace( this.parent.locals );
+			this.replace( this.parent.globals );
+			this.len = this.str.length - 1;
 		}
 	};
 
@@ -241,29 +241,7 @@
 	$.jade.clear_globals = function () {
 		JadeDom.prototype.globals = {};
 	};
-	//-- loops and logic
-	$.jade.when = function () {
-		var args = Array.apply( null, arguments ),
-			condition = args.shift();
-		return condition ? $.jade.apply( null, args ) : '';
-	};
-	$.jade.each = function () {
-		console.log( arguments );
-		var args = Array.apply( null, arguments ),
-			arr  = args.shift(),
-			len  = arr.length,
-			frag, i, temp;
-		if ( len === 1 ) return $.jade.apply( null, args );
-		frag = document.createDocumentFragment();
-		for ( i = 0; i < len; i++ ) {
-			temp = [ arr[ i ] ];
-			temp.push.apply( temp, args );
-			frag.appendChild( $.jade.apply( null, temp ).get( 0 ) );
-		}
-		return $( frag );
-	};
-
-	//-- for debugging purposes
+	//-- $._jade provides access to the root objects for unit tests and debugging
 	$._jade = {
 		main: JadeDom,
 		parser: JadeParser

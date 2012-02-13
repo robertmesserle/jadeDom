@@ -628,51 +628,7 @@ describe( 'jadeDom Features', function () {
 
 	describe( 'Loops and Logic', function () {
 
-		describe( '$.jade.when()', function () {
 
-			var $true = $.jade.when( true, 'div.true' ),
-				$false = $.jade.when( false, 'div.false' ),
-				$nest = $.jade(
-					'div.wrapper', [
-						$.jade.when( true, 'div.moose' ),
-						$.jade.when( false, 'div.mouse' )
-					]
-				);
-
-			it( 'should return the contents when the condition is true', function () {
-				expect( $true.is( 'div.true' ) ).toBe( true );
-			} );
-
-			it( 'should return an empty string when the condition is false', function () {
-				expect( $false ).toBe( '' );
-			} );
-
-			it( 'should work when nested in another $.jade() call', function () {
-				expect( $nest.is( 'div.wrapper' ) ).toBe( true );
-				expect( $nest.children( 'div.moose' ).length ).toBeGreaterThan( 0 );
-				expect( $nest.children( 'div.mouse' ).length ).toBe( 0 );
-			} );
-
-		} );
-
-		describe( '$.jade.each()', function () {
-
-			describe( 'Nested', function () {
-				var data = [ { url: 'http:/www.google.com', name: 'Google' }, { url: 'http://www.youtube.com', name: 'YouTube' } ],
-					$elem = $.jade(
-					'div.wrapper', [
-						$.jade.each( data, 'a(href=!{url}) #{name}' )
-					]
-				);
-				it( 'should be a div with a class of wrapper', function () {
-					expect( $elem.is( 'div.wrapper' ) ).toBe( true );
-				} );
-				it( 'should have 2 children', function () {
-					expect( $elem.children().length ).toBe( 2 );
-				} );
-			} );
-
-		} );
 
 	} );
 
