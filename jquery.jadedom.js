@@ -4,6 +4,7 @@
 	'use strict';
 
 	function get_property ( obj, namespace, not_found_value ) {
+		console.log( namespace );
 		if ( typeof obj === 'undefined' )   return typeof not_found_value !== 'undefined' ? not_found_value : false;
 		if ( namespace.indexOf( '.' ) < 0 ) return typeof obj[ namespace ] !== 'undefined' ? obj[ namespace ] : typeof not_found_value !== 'undefined' ? not_found_value : false;
 		var namespace_array  = namespace.split('.'),
@@ -278,10 +279,20 @@
 			}
 		},
 		replace: function ( map ) {
-			for ( var key in map ) {
-				this.str = this.str.replace( new RegExp( '#\\{' + key + '\\}', 'g' ), this.escape_html( map[ key ] ) );
-				this.str = this.str.replace( new RegExp( '!\\{' + key + '\\}', 'g' ), map[ key ] );
+			this.replace_escaped( map );
+			this.replace_unescaped( map );
+		},
+		replace_escaped: function ( map ) {
+			var matches = this.str.match( /#\{[\w\d_\$\.]+\}/g ),
+				i       = matches ? matches.length : 0;
+			while ( i-- ) {
+				this.str = this.str.replace( matches[ i ], this.escape_html( get_property( map, matches[ i ].replace( /[#\{\}]*/g, '' ), matches[ i ] ) ) );
 			}
+		},
+		replace_unescaped: function ( map ) {
+			var matches = this.str.match( /!\{[\w\d_\$\.]+\}/g ),
+				i       = matches ? matches.length : 0;
+			while ( i-- ) this.str = this.str.replace( matches[ i ], get_property( map, matches[ i ].replace( /[!\{\}]*/g, '' ), matches[ i ] ) );
 		},
 		variable_replacement: function () {
 			this.replace( this.parent.locals );

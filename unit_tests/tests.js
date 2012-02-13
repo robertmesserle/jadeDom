@@ -471,6 +471,22 @@ describe( 'jadeDom Features', function () {
 	                } );
 	            } );
 
+				describe( 'Nested variables: foo.bar', function () {
+					var $elem = $.jade( { foo: { bar: 'baz' } },
+						'div.something !{foo.bar}'
+					);
+
+					it( 'should be a div', function () {
+						expect( $elem.is( 'div' ) ).toBe( true );
+					} );
+					it( 'should have a class of "something"', function () {
+						expect( $elem.is( '.something' ) ).toBe( true );
+					} );
+					it( 'should have the text "baz"', function () {
+						expect( $elem.text() ).toBe( 'baz' );
+					} );
+				} );
+
 			} );
 
 			describe( 'Escaped', function () {
@@ -905,6 +921,10 @@ describe( 'jadeDom Features', function () {
 					expect( $elem.children( 'div.baz' ).length ).toBe( 1 );
 				} );
 			} );
+
+		} );
+
+		describe( 'else()', function () {
 
 		} );
 
