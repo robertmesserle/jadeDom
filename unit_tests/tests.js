@@ -879,3 +879,31 @@ describe( 'jadeDom Features', function () {
 	} );
 
 } );
+
+describe( 'jadeDom Unit Tests', function () {
+
+	describe( '$._jade.handle_logic()', function () {
+
+		it( 'should be true for: - if ( true )', function () {
+			expect( new $._jade.main().handle_logic( '- if( true )' ) ).toBe( true );
+		} );
+
+		it( 'should be false for: - if ( false )', function () {
+			expect( new $._jade.main().handle_logic( '- if( false )' ) ).toBe( false );
+		} );
+
+		it( 'should be true for: - if ( true == 1 )', function () {
+			expect( new $._jade.main().handle_logic( '- if( true == 1 )' ) ).toBe( true );
+		} );
+
+		it( 'should be true for: - if ( 4 > 3 )', function () {
+			expect( new $._jade.main().handle_logic( '- if( 4 > 3 )' ) ).toBe( true );
+		} );
+
+		it( 'should be false for: - if ( 4 < 3 )', function () {
+			expect( new $._jade.main().handle_logic( '- if( 4 < 3 )' ) ).toBe( false );
+		} );
+
+	} );
+
+} );
