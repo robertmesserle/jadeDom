@@ -808,6 +808,50 @@ describe( 'jadeDom Features', function () {
 				} );
 			} );
 
+			describe( 'if ( something == "moose" ) // true', function () {
+
+				var $elem = $.jade( { something: 'moose' },
+					'div.wrapper', [
+						'div.foo',
+						'- if ( something == "moose" )', [
+							'div.bar'
+						],
+						'div.baz'
+					]
+				);
+
+				it( 'should have 3 children', function () {
+					expect( $elem.children().length ).toBe( 3 );
+				} );
+				it( 'should have div.foo, div.bar, and div.baz', function () {
+					expect( $elem.children( 'div.foo' ).length ).toBe( 1 );
+					expect( $elem.children( 'div.bar' ).length ).toBe( 1 );
+					expect( $elem.children( 'div.baz' ).length ).toBe( 1 );
+				} );
+			} );
+
+			describe( 'if ( something == "meese" ) // false', function () {
+
+				var $elem = $.jade( { something: 'moose' },
+					'div.wrapper', [
+						'div.foo',
+						'- if ( something == "meese" )', [
+							'div.bar'
+						],
+						'div.baz'
+					]
+				);
+
+				it( 'should have 3 children', function () {
+					expect( $elem.children().length ).toBe( 2 );
+				} );
+				it( 'should have div.foo and div.baz', function () {
+					expect( $elem.children( 'div.foo' ).length ).toBe( 1 );
+					expect( $elem.children( 'div.bar' ).length ).toBe( 0 );
+					expect( $elem.children( 'div.baz' ).length ).toBe( 1 );
+				} );
+			} );
+
 		} );
 
 	} );

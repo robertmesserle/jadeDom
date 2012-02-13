@@ -91,7 +91,7 @@
 		},
 		handle_logic: function ( str ) {
 			var parts;
-			if ( parts = str.match( /-\s*if[\s\(]+([\w\d_]+)(\s*((==)|(>=)|(<=)|(<)|(>)|(===)|(!==)|(!=))\s*([\w\d_])+)?[\s\)]*/ ) ) return this.logic = this.handle_if( parts.slice( 1 ) );
+			if ( parts = str.match( /-\s*if[\s\(]+([\w\d_'"]+)(\s*((==)|(>=)|(<=)|(<)|(>)|(===)|(!==)|(!=))\s*([\w\d_'"])+)?[\s\)]*/ ) ) return this.logic = this.handle_if( parts.slice( 1 ) );
 		},
 		remove_undefined: function ( parts ) {
 			for ( var i = parts.length; i--; ) if ( typeof parts[ i ] === 'undefined' ) parts.splice( i, 1 );
@@ -117,14 +117,15 @@
 			str = $.trim( str );
 			var ret;
 			switch ( str ) {
-				case 'true': return true;
-				case 'false': return false;
+				case 'true':    return true;
+				case 'false':   return false;
 				default:
-					ret = str == parseFloat( str )
+					return str == parseFloat( str )
 						? str
-						: this.get_property( str );
+						: str.toString().charAt( 0 ) === '"'
+							? str.substring( 1, str.length - 1 )
+							: this.get_property( str );
 			}
-			return ret;
 		},
 		get_property: function ( str ) {
 			return get_property( this.locals, str, get_property( this.globals, str, false ) );
