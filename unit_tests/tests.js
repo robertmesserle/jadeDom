@@ -926,18 +926,48 @@ describe( 'jadeDom Features', function () {
 
 		describe( 'else()', function () {
 
-			var $elem = $.jade( { foo: 'bar' },
-				'div.wrapper', [
-					'- if ( foo == "bar" )', [ 'div.if If' ],
-					'- else', [ 'div.else Else' ]
-				]
-			);
+			describe( 'if should fire, else should be ignored', function () {
 
-			it( 'should have div.if', function () {
-				expect( $elem.find( 'div.if' ).length ).toBe( 1 );
+				var $elem = $.jade( { foo: 'bar' },
+					'div.wrapper', [
+						'- if ( foo == "bar" )', [
+							'div.if If'
+						],
+						'- else', [
+							'div.else Else'
+						]
+					]
+				);
+
+				it( 'should have div.if', function () {
+					expect( $elem.find( 'div.if' ).length ).toBe( 1 );
+				} );
+				it( 'should not have div.else', function () {
+					expect( $elem.find( 'div.else' ).length ).toBe( 0 );
+				} );
+
 			} );
-			it( 'should not have div.else', function () {
-				expect( $elem.find( 'div.else' ).length ).toBe( 0 );
+
+			describe( 'if should be ignored, else should fire', function () {
+
+				var $elem = $.jade( { foo: 'bar' },
+					'div.wrapper', [
+						'- if ( foo == "baz" )', [
+							'div.if If'
+						],
+						'- else', [
+							'div.else Else'
+						]
+					]
+				);
+
+				it( 'should have div.if', function () {
+					expect( $elem.find( 'div.if' ).length ).toBe( 0 );
+				} );
+				it( 'should not have div.else', function () {
+					expect( $elem.find( 'div.else' ).length ).toBe( 1 );
+				} );
+
 			} );
 
 		} );
