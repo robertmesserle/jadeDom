@@ -104,6 +104,7 @@
 			} else if ( parts.length > 1 ) {
 				switch ( parts[ 3 ] ) {
 					case '==':  return this.get_var( parts[ 0 ] ) ==  this.get_var( parts[ 1 ].replace( parts[ 3 ], '' ) );
+					case '===': return this.get_var( parts[ 0 ] ) === this.get_var( parts[ 1 ].replace( parts[ 3 ], '' ) );
 					case '!==': return this.get_var( parts[ 0 ] ) !== this.get_var( parts[ 1 ].replace( parts[ 3 ], '' ) );
 					case '!=':  return this.get_var( parts[ 0 ] ) !=  this.get_var( parts[ 1 ].replace( parts[ 3 ], '' ) );
 					case '>':   return this.get_var( parts[ 0 ] ) >   this.get_var( parts[ 1 ].replace( parts[ 3 ], '' ) );
@@ -121,7 +122,7 @@
 				case 'false':   return false;
 				default:
 					return str == parseFloat( str )
-						? str
+						? +str
 						: str.toString().charAt( 0 ) === '"'
 							? str.substring( 1, str.length - 1 )
 							: this.get_property( str );
