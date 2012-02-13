@@ -372,6 +372,38 @@ describe( 'jadeDom Features', function () {
 
 		} );
 
+		describe( 'Many levels deep', function () {
+
+			describe( '4 levels of div\'s', function () {
+				var $elem = $.jade(
+					'div', [
+						'div', [
+							'div', [
+								'div'
+							]
+						]
+					]
+				);
+
+				it( 'should have 1 level of div\'s', function () {
+					expect( $elem.filter( 'div' ).length ).toBe( 1 );
+				} );
+
+				it( 'should have 2 levels of div\'s', function () {
+					expect( $elem.filter( 'div' ).children( 'div' ).length ).toBe( 1 );
+				} );
+
+				it( 'should have 3 levels of div\'s', function () {
+					expect( $elem.filter( 'div' ).children( 'div' ).children( 'div' ).length ).toBe( 1 );
+				} );
+
+				it( 'should have 4 levels of div\'s', function () {
+					expect( $elem.filter( 'div' ).children( 'div' ).children( 'div' ).children( 'div' ).length ).toBe( 1 );
+				} );
+			} );
+
+		} );
+
 	} );
 
 	describe( 'Variable Replacement', function () {

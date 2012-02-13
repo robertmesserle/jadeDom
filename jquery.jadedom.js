@@ -17,8 +17,8 @@
 
 	function JadeDom () {
 		this.lookup_table = {};
-		this.logic        = true;
-		this.last_logic   = true;
+		this.logic        = 'none';
+		this.last_logic   = 'none';
 	}
 	JadeDom.prototype = {
 		globals: {},
@@ -68,7 +68,7 @@
 			if ( !children.length ) return;
 			if ( !this.logic ) {
 				this.last_logic = this.logic;
-				this.logic = true;
+				this.logic = 'none';
 				return;
 			}
 			var last_elem = elem, child, type;
@@ -82,9 +82,9 @@
 						if ( elem === false ) elem = last_elem;     // if there is no root elem yet, set it to last_elem
 						else elem.appendChild( last_elem );         // otherwise, append it to the existing node
 						break;
-					case 'logic':       this.handle_logic( child );                                 break;
-					case 'children':    this.add_children( this.logic ? elem : last_elem, child );  break;
-					case 'options':     this.handle_object( last_elem, child );                     break;
+					case 'logic':       this.handle_logic( child );                                         break;
+					case 'children':    this.add_children( this.logic === true ? elem : last_elem, child ); break;
+					case 'options':     this.handle_object( last_elem, child );                             break;
 				}
 			}
 			return elem;
@@ -123,7 +123,7 @@
 				default:
 					return str == parseFloat( str )
 						? +str
-						: str.toString().charAt( 0 ) === '"'
+						: str.toString().charAt( 0 ) === '"' || str.toString().charAt( 0 ) === '\''
 							? str.substring( 1, str.length - 1 )
 							: this.get_property( str );
 			}
