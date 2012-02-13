@@ -4,7 +4,6 @@
 	'use strict';
 
 	function get_property ( obj, namespace, not_found_value ) {
-		console.log( namespace );
 		if ( typeof obj === 'undefined' )   return typeof not_found_value !== 'undefined' ? not_found_value : false;
 		if ( namespace.indexOf( '.' ) < 0 ) return typeof obj[ namespace ] !== 'undefined' ? obj[ namespace ] : typeof not_found_value !== 'undefined' ? not_found_value : false;
 		var namespace_array  = namespace.split('.'),
