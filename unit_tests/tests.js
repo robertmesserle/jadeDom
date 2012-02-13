@@ -628,7 +628,187 @@ describe( 'jadeDom Features', function () {
 
 	describe( 'Loops and Logic', function () {
 
+		describe( 'if()', function () {
 
+			describe( 'if (true)', function () {
+
+				var $elem = $.jade(
+					'div.wrapper', [
+						'div.foo',
+						'- if (true)', [
+							'div.bar'
+						],
+						'div.baz'
+					]
+				);
+
+				it( 'should have 3 children', function () {
+					expect( $elem.children().length ).toBe( 3 );
+				} );
+				it( 'should have div.foo, div.bar, and div.baz', function () {
+					expect( $elem.children( 'div.foo' ).length ).toBe( 1 );
+					expect( $elem.children( 'div.bar' ).length ).toBe( 1 );
+					expect( $elem.children( 'div.baz' ).length ).toBe( 1 );
+				} );
+
+			} );
+
+			describe( 'if (true == true)', function () {
+
+				var $elem = $.jade(
+					'div.wrapper', [
+						'div.foo',
+						'- if (true==true)', [
+							'div.bar'
+						],
+						'div.baz'
+					]
+				);
+
+				it( 'should have 3 children', function () {
+					expect( $elem.children().length ).toBe( 3 );
+				} );
+				it( 'should have div.foo, div.bar, and div.baz', function () {
+					expect( $elem.children( 'div.foo' ).length ).toBe( 1 );
+					expect( $elem.children( 'div.bar' ).length ).toBe( 1 );
+					expect( $elem.children( 'div.baz' ).length ).toBe( 1 );
+				} );
+			} );
+
+			describe( 'if (true == false)', function () {
+
+				var $elem = $.jade(
+					'div.wrapper', [
+						'div.foo',
+						'- if (true==false)', [
+							'div.bar'
+						],
+						'div.baz'
+					]
+				);
+
+				it( 'should have 2 children', function () {
+					expect( $elem.children().length ).toBe( 2 );
+				} );
+				it( 'should have div.foo and div.baz, but not div.bar', function () {
+					expect( $elem.children( 'div.foo' ).length ).toBe( 1 );
+					expect( $elem.children( 'div.bar' ).length ).toBe( 0 );
+					expect( $elem.children( 'div.baz' ).length ).toBe( 1 );
+				} );
+			} );
+
+			describe( 'if ( 1 == 1 )', function () {
+
+				var $elem = $.jade(
+					'div.wrapper', [
+						'div.foo',
+						'- if ( 1 == 1 )', [
+							'div.bar'
+						],
+						'div.baz'
+					]
+				);
+
+				it( 'should have 3 children', function () {
+					expect( $elem.children().length ).toBe( 3 );
+				} );
+				it( 'should have div.foo, div.bar, and div.baz', function () {
+					expect( $elem.children( 'div.foo' ).length ).toBe( 1 );
+					expect( $elem.children( 'div.bar' ).length ).toBe( 1 );
+					expect( $elem.children( 'div.baz' ).length ).toBe( 1 );
+				} );
+			} );
+
+			describe( 'if ( 1 >= 1 )', function () {
+
+				var $elem = $.jade(
+					'div.wrapper', [
+						'div.foo',
+						'- if ( 1 >= 1 )', [
+							'div.bar'
+						],
+						'div.baz'
+					]
+				);
+
+				it( 'should have 3 children', function () {
+					expect( $elem.children().length ).toBe( 3 );
+				} );
+				it( 'should have div.foo, div.bar, and div.baz', function () {
+					expect( $elem.children( 'div.foo' ).length ).toBe( 1 );
+					expect( $elem.children( 'div.bar' ).length ).toBe( 1 );
+					expect( $elem.children( 'div.baz' ).length ).toBe( 1 );
+				} );
+			} );
+
+			describe( 'if ( 1 >= 2 )', function () {
+
+				var $elem = $.jade(
+					'div.wrapper', [
+						'div.foo',
+						'- if ( 1 >= 2 )', [
+							'div.bar'
+						],
+						'div.baz'
+					]
+				);
+
+				it( 'should have 3 children', function () {
+					expect( $elem.children().length ).toBe( 2 );
+				} );
+				it( 'should have div.foo and div.baz', function () {
+					expect( $elem.children( 'div.foo' ).length ).toBe( 1 );
+					expect( $elem.children( 'div.bar' ).length ).toBe( 0 );
+					expect( $elem.children( 'div.baz' ).length ).toBe( 1 );
+				} );
+			} );
+
+			describe( 'if ( 1 >= 1 )', function () {
+
+				var $elem = $.jade(
+					'div.wrapper', [
+						'div.foo',
+						'- if ( 1 >= 1 )', [
+							'div.bar'
+						],
+						'div.baz'
+					]
+				);
+
+				it( 'should have 3 children', function () {
+					expect( $elem.children().length ).toBe( 3 );
+				} );
+				it( 'should have div.foo, div.bar, and div.baz', function () {
+					expect( $elem.children( 'div.foo' ).length ).toBe( 1 );
+					expect( $elem.children( 'div.bar' ).length ).toBe( 1 );
+					expect( $elem.children( 'div.baz' ).length ).toBe( 1 );
+				} );
+
+			} );
+
+			describe( 'if ( something > something_else ) // true', function () {
+
+				var $elem = $.jade( { something: 2, something_else: 1 },
+					'div.wrapper', [
+						'div.foo',
+						'- if ( something > something_else )', [
+							'div.bar'
+						],
+						'div.baz'
+					]
+				);
+
+				it( 'should have 3 children', function () {
+					expect( $elem.children().length ).toBe( 3 );
+				} );
+				it( 'should have div.foo, div.bar, and div.baz', function () {
+					expect( $elem.children( 'div.foo' ).length ).toBe( 1 );
+					expect( $elem.children( 'div.bar' ).length ).toBe( 1 );
+					expect( $elem.children( 'div.baz' ).length ).toBe( 1 );
+				} );
+			} );
+
+		} );
 
 	} );
 

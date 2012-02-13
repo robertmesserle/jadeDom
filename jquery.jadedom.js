@@ -3,8 +3,22 @@
 
 	'use strict';
 
+	function get_property ( obj, namespace, not_found_value ) {
+		if ( typeof obj === 'undefined' )   return typeof not_found_value !== 'undefined' ? not_found_value : false;
+		if ( namespace.indexOf( '.' ) < 0 ) return typeof obj[ namespace ] !== 'undefined' ? obj[ namespace ] : typeof not_found_value !== 'undefined' ? not_found_value : false;
+		var namespace_array  = namespace.split('.'),
+			namespace_length = namespace_array.length,
+			val              = obj, i;
+		for ( i = 0; i < namespace_length; i++ )
+			if ( typeof( val = val[ namespace_array[ i ] ] ) === 'undefined' )
+				return typeof not_found_value !== 'undefined' ? not_found_value : false;
+		return typeof val !== 'undefined' ? val : typeof not_found_value !== 'undefined' ? not_found_value : false;
+		}
+
 	function JadeDom () {
 		this.lookup_table = {};
+		this.logic        = true;
+		this.last_logic   = true;
 	}
 	JadeDom.prototype = {
 		globals: {},
@@ -45,12 +59,18 @@
 		},
 		get_type: function ( arg ) {
 			if ( arg instanceof Array ) return 'children';
+			if ( typeof arg === 'string' && arg.charAt( 0 ) === '-' ) return 'logic';
 			if ( typeof arg === 'string' || arg.jquery || arg.nodeType ) return 'node';
 			if ( typeof arg === 'object' ) return 'options';
 			return false;
 		},
 		add_children : function ( elem, children, top_level ) {
 			if ( !children.length ) return;
+			if ( !this.logic ) {
+				this.last_logic = this.logic;
+				this.logic = true;
+				return;
+			}
 			var last_elem = elem, child, type;
 			for ( var i = 0, len = children.length; i < len; i++ ) {
 				child = children[ i ];
@@ -62,11 +82,52 @@
 						if ( elem === false ) elem = last_elem;     // if there is no root elem yet, set it to last_elem
 						else elem.appendChild( last_elem );         // otherwise, append it to the existing node
 						break;
-					case 'children':    this.add_children( last_elem, child );  break;
-					case 'options':     this.handle_object( last_elem, child ); break;
+					case 'logic':       this.handle_logic( child );                                 break;
+					case 'children':    this.add_children( this.logic ? elem : last_elem, child );  break;
+					case 'options':     this.handle_object( last_elem, child );                     break;
 				}
 			}
 			return elem;
+		},
+		handle_logic: function ( str ) {
+			var parts;
+			if ( parts = str.match( /-\s*if[\s\(]+([\w\d_]+)(\s*((==)|(>=)|(<=)|(<)|(>)|(===)|(!==)|(!=))\s*([\w\d_])+)?[\s\)]*/ ) ) return this.logic = this.handle_if( parts.slice( 1 ) );
+		},
+		remove_undefined: function ( parts ) {
+			for ( var i = parts.length; i--; ) if ( typeof parts[ i ] === 'undefined' ) parts.splice( i, 1 );
+
+		},
+		handle_if: function ( parts ) {
+			this.remove_undefined( parts );
+			if ( parts.length === 1 ) {
+				return !!this.get_var( parts[ 0 ] );
+			} else if ( parts.length > 1 ) {
+				switch ( parts[ 3 ] ) {
+					case '==':  return this.get_var( parts[ 0 ] ) ==  this.get_var( parts[ 1 ].replace( parts[ 3 ], '' ) );
+					case '!==': return this.get_var( parts[ 0 ] ) !== this.get_var( parts[ 1 ].replace( parts[ 3 ], '' ) );
+					case '!=':  return this.get_var( parts[ 0 ] ) !=  this.get_var( parts[ 1 ].replace( parts[ 3 ], '' ) );
+					case '>':   return this.get_var( parts[ 0 ] ) >   this.get_var( parts[ 1 ].replace( parts[ 3 ], '' ) );
+					case '>=':  return this.get_var( parts[ 0 ] ) >=  this.get_var( parts[ 1 ].replace( parts[ 3 ], '' ) );
+					case '<':   return this.get_var( parts[ 0 ] ) <   this.get_var( parts[ 1 ].replace( parts[ 3 ], '' ) );
+					case '<=':  return this.get_var( parts[ 0 ] ) <=  this.get_var( parts[ 1 ].replace( parts[ 3 ], '' ) );
+				}
+			}
+		},
+		get_var: function ( str ) {
+			str = $.trim( str );
+			var ret;
+			switch ( str ) {
+				case 'true': return true;
+				case 'false': return false;
+				default:
+					ret = str == parseFloat( str )
+						? str
+						: this.get_property( str );
+			}
+			return ret;
+		},
+		get_property: function ( str ) {
+			return get_property( this.locals, str, get_property( this.globals, str, false ) );
 		},
 		get_node: function ( elem ) {
 			if ( typeof elem === 'string' ) return this.get_node_from_string( elem );
@@ -130,7 +191,7 @@
 			if ( this.html[ 0 ] ) this.elem.innerHTML = this.html;
 		},
 		escape_html: function ( str ) {
-			return str.replace( /&/g, '&ampl;' ).replace( />/g, '&gt;' ).replace( /</g, '&lt;' ).replace( /"/g, '&quot;' );
+			return str.toString().replace( /&/g, '&ampl;' ).replace( />/g, '&gt;' ).replace( /</g, '&lt;' ).replace( /"/g, '&quot;' );
 		},
 		get_content: function () {
 			if ( this.mode === false ) return;
