@@ -96,7 +96,7 @@
 					iteration_locals[ this.logic[ 0 ] ] = collection[ i ];
 					new JadeDom( this.lookup_table, $.extend( {}, this.locals, iteration_locals ), elem ).init( children );
 				}
-				return;
+				this.logic = 'none';
 			} else {
 				new JadeDom( this.lookup_table, this.locals, elem ).init( children );
 			}
