@@ -1004,6 +1004,18 @@ describe( 'jadeDom Unit Tests', function () {
 			expect( new $._jade.main().handle_logic( '- if ( "howdy, partner!" == "howdy partner!" )' ) ).toBe( false );
 		} );
 
+		it( 'should be true for: - if ( foo.bar == "howdy, partner!" )', function () {
+			$.jade.set_globals( { foo: { bar: 'howdy, partner!' } } );
+			expect( new $._jade.main().handle_logic( '- if ( foo.bar == "howdy, partner!" )' ) ).toBe( true );
+			$.jade.clear_globals();
+		} );
+
+		it( 'should be false for: - if ( foo.bar == "howdy partner!" )', function () {
+			$.jade.set_globals( { foo: { bar: 'howdy, partner!' } } );
+			expect( new $._jade.main().handle_logic( '- if ( foo.bar == "howdy partner!" )' ) ).toBe( false );
+			$.jade.clear_globals();
+		} );
+
 		it( 'should be false for: - if ( 4 < 3 )', function () {
 			expect( new $._jade.main().handle_logic( '- if( 4 < 3 )' ) ).toBe( false );
 		} );
