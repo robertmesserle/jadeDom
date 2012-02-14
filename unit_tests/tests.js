@@ -1030,6 +1030,28 @@ describe( 'jadeDom Features', function () {
 			} );
 		} );
 
+		describe( 'each', function () {
+
+			var $elem = $.jade( { nums: [ 1, 2, 3 ] },
+				'div.wrapper', [
+					'- each num in nums', [
+						'div #{num}'
+					]
+				]
+			);
+
+			it( 'should have 3 children', function () {
+				expect( $elem.children().length ).toBe( 3 );
+			} );
+			it( 'should contain the text "123"', function () {
+				expect( $elem.text() ).toBe( '123' );
+			} );
+			it( 'should contain the html "<div>1</div><div>2</div><div>3</div>', function () {
+				expect( $elem.html() ).toBe( '<div>1</div><div>2</div><div>3</div>' );
+			} );
+
+		} );
+
 	} );
 
 } );

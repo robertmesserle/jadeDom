@@ -78,7 +78,7 @@
 					case 'locals':      this.locals = child;                                                        break;
 					case 'node':        this.root.appendChild( last_elem = this.get_node( child ) );                break;
 					case 'logic':       this.handle_logic( child );                                                 break;
-					case 'children':    this.add_children( this.logic === true ? this.root : last_elem, child );    break;
+					case 'children':    this.add_children( this.logic !== 'none' ? this.root : last_elem, child );  break;
 					case 'options':     this.handle_object( last_elem, child );                                     break;
 				}
 			}
@@ -88,18 +88,27 @@
 			if ( !this.logic ) {
 				this.last_logic = this.logic;
 				this.logic = 'none';
+			} else if ( this.logic instanceof Array ) {
+				var collection = this.get_property( this.logic[ 1 ] ),
+					iteration_locals;
+				for ( var i = 0, len = collection.length; i < len; i++ ) {
+					iteration_locals = { index: i };
+					iteration_locals[ this.logic[ 0 ] ] = collection[ i ];
+					new JadeDom( this.lookup_table, $.extend( {}, this.locals, iteration_locals ), elem ).init( children );
+				}
 				return;
+			} else {
+				new JadeDom( this.lookup_table, this.locals, elem ).init( children );
 			}
-			new JadeDom( this.lookup_table, this.locals, elem ).init( children );
 		},
 		handle_logic: function ( str ) {
 			var parts;
 			if ( parts = str.match( /^-\s*if[\s\(]+([\w\d_\.]+|['"][^'"]*['"])(\s*((==)|(>=)|(<=)|(<)|(>)|(===)|(!==)|(!=))\s*([\w\d_\.]+|['"][^'"]*['"])+)?[\s\)]*$/ ) ) return this.logic = this.handle_if( parts.slice( 1 ) );
 			if ( str.match( /^-\s*else\s*$/ ) ) return this.logic = !this.last_logic;
+			if ( parts = str.match( /^-\s*each\s+([\w\d_\.]+)\s+in\s+([\w\d_\.]+)\s*$/ ) ) return this.handle_each( parts.slice( 1 ) );
 		},
-		remove_undefined: function ( parts ) {
-			for ( var i = parts.length; i--; ) if ( typeof parts[ i ] === 'undefined' ) parts.splice( i, 1 );
-
+		handle_each: function ( parts ) {
+			this.logic = parts;
 		},
 		handle_if: function ( parts ) {
 			this.remove_undefined( parts );
@@ -117,6 +126,10 @@
 					case '<=':  return this.get_var( parts[ 0 ] ) <=  this.get_var( parts[ 1 ].replace( parts[ 3 ], '' ) );
 				}
 			}
+		},
+		remove_undefined: function ( parts ) {
+			for ( var i = parts.length; i--; ) if ( typeof parts[ i ] === 'undefined' ) parts.splice( i, 1 );
+
 		},
 		get_var: function ( str ) {
 			str = $.trim( str );
