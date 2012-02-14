@@ -922,6 +922,34 @@ describe( 'jadeDom Features', function () {
 				} );
 			} );
 
+			describe( 'logic nested within if: link example from robertmesserle.com', function () {
+				var $elem = $.jade( { url: 'http://www.google.com' },
+					'dl', [
+						'- if url', [
+							'dt Link',
+							'dd', [ 'a(href=!{url}) #{url}' ]
+						]
+					]
+				);
+				it( 'shouild be a dl', function () {
+					expect( $elem.is( 'dl' ) ).toBe( true );
+				} );
+				it( 'should contain a dt with the text "Link"', function () {
+					expect( $elem.children( 'dt' ).length ).toBe( 1 );
+					expect( $elem.children( 'dt' ).text() ).toBe( 'Link' );
+				} );
+				it( 'should container a dd with a link', function () {
+					expect( $elem.children( 'dd' ).length ).toBe( 1 );
+					expect( $elem.children( 'dd' ).children( 'a' ).length ).toBe( 1 );
+				} );
+				it( 'should link to the url', function () {
+					expect( $elem.find( 'a' ).attr( 'href' ) ).toBe( 'http://www.google.com' );
+				} );
+				it( 'should contain the text of the url', function () {
+					expect( $elem.find( 'a' ).text() ).toBe( 'http://www.google.com' );
+				} );
+			} );
+
 		} );
 
 		describe( 'else()', function () {
@@ -970,6 +998,36 @@ describe( 'jadeDom Features', function () {
 
 			} );
 
+		} );
+
+		describe( 'Nested if/else', function () {
+			var $elem = $.jade(
+				'div.wrapper', [
+					'- if true', [
+						'- if false', [
+							'div true false'
+						],
+						'- else', [
+							'div true true'
+						]
+					],
+					'- else', [
+						'- if true', [
+							'div false true'
+						],
+						'- else', [
+							'div false false'
+						]
+					]
+				]
+			);
+
+			it( 'should have only one div', function () {
+				expect( $elem.children( 'div' ).length ).toBe( 1 );
+			} );
+			it( 'should contain the text "true true"', function () {
+				expect( $elem.text() ).toBe( 'true true' );
+			} );
 		} );
 
 	} );

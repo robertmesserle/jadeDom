@@ -15,18 +15,23 @@
 		return typeof val !== 'undefined' ? val : typeof not_found_value !== 'undefined' ? not_found_value : false;
 		}
 
-	function JadeDom () {
-		this.lookup_table = {};
+	function JadeDom ( lookup_table, locals, root ) {
+		if ( arguments.length ) this.show_lookup = false;
+		if ( locals ) this.locals = locals;
+		this.lookup_table = lookup_table || {};
 		this.logic        = 'none';
 		this.last_logic   = 'none';
+		this.root         = root || document.createDocumentFragment();
 	}
 	JadeDom.prototype = {
 		globals: {},
 		locals: {},
+		show_lookup: true,
 		init: function ( args ) {
-			var ret = this.add_children( false, args, true ),
-				$ret = $( ret );
-			$ret.lookup = $.proxy( this, 'lookup' );
+			this.handle_root( args );
+			if ( this.root.childNodes.length === 1 ) this.root = this.root.firstChild;
+			var $ret = $( this.root );
+			if ( this.show_lookup ) $ret.lookup = $.proxy( this, 'lookup' );
 			return $ret;
 		},
 		lookup: function ( str ) {
@@ -34,7 +39,6 @@
 			return this.lookup_table[ str ] || false;
 		},
 		handle_object: function ( elem, obj ) {
-			if ( elem === false ) return this.locals = obj;
 			var $elem = $(elem), val;
 			for ( var key in obj ) {
 				val = obj[ key ];
@@ -57,37 +61,36 @@
 					: $elem
 			}
 		},
-		get_type: function ( arg ) {
+		get_type: function ( arg, i ) {
 			if ( arg instanceof Array ) return 'children';
 			if ( typeof arg === 'string' && arg.charAt( 0 ) === '-' ) return 'logic';
 			if ( typeof arg === 'string' || arg.jquery || arg.nodeType ) return 'node';
-			if ( typeof arg === 'object' ) return 'options';
+			if ( typeof arg === 'object' ) return i > 0 ? 'options' : 'locals';
 			return false;
 		},
-		add_children : function ( elem, children, top_level ) {
+		handle_root : function ( children ) {
+			if ( !children.length ) return;
+			var last_elem = this.root, child, type;
+			for ( var i = 0, len = children.length; i < len; i++ ) {
+				child = children[ i ];
+				type = this.get_type( child, i );
+				switch ( type ) {
+					case 'locals':      this.locals = child;                                                        break;
+					case 'node':        this.root.appendChild( last_elem = this.get_node( child ) );                break;
+					case 'logic':       this.handle_logic( child );                                                 break;
+					case 'children':    this.add_children( this.logic === true ? this.root : last_elem, child );    break;
+					case 'options':     this.handle_object( last_elem, child );                                     break;
+				}
+			}
+		},
+		add_children: function ( elem, children) {
 			if ( !children.length ) return;
 			if ( !this.logic ) {
 				this.last_logic = this.logic;
 				this.logic = 'none';
 				return;
 			}
-			var last_elem = elem, child, type;
-			for ( var i = 0, len = children.length; i < len; i++ ) {
-				child = children[ i ];
-				type = this.get_type( child );
-				switch ( type ) {
-					case 'node':
-						if ( top_level && elem && elem === last_elem ) ( elem = document.createDocumentFragment() ).appendChild( last_elem );   // switch to fragment if necessary
-						last_elem = this.get_node( child );         // get node and store it in last_elem
-						if ( elem === false ) elem = last_elem;     // if there is no root elem yet, set it to last_elem
-						else elem.appendChild( last_elem );         // otherwise, append it to the existing node
-						break;
-					case 'logic':       this.handle_logic( child );                                         break;
-					case 'children':    this.add_children( this.logic === true ? elem : last_elem, child ); break;
-					case 'options':     this.handle_object( last_elem, child );                             break;
-				}
-			}
-			return elem;
+			new JadeDom( this.lookup_table, this.locals, elem ).init( children );
 		},
 		handle_logic: function ( str ) {
 			var parts;
