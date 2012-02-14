@@ -1,4 +1,4 @@
-/*! jadeDom v1.0 by Robert Messerle  |  https://github.com/robertmesserle/jadeDom */
+/*! jadeDom v1.1 by Robert Messerle  |  https://github.com/robertmesserle/jadeDom */
 ( function ( $ ) {
 
 	'use strict';
