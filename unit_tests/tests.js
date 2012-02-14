@@ -996,6 +996,14 @@ describe( 'jadeDom Unit Tests', function () {
 			expect( new $._jade.main().handle_logic( '- if( 4 > 3 )' ) ).toBe( true );
 		} );
 
+		it( 'should be true for: - if ( "howdy, partner!" == "howdy, partner!" )', function () {
+			expect( new $._jade.main().handle_logic( '- if ( "howdy, partner!" == "howdy, partner!" )' ) ).toBe( true );
+		} );
+
+		it( 'should be false for: - if ( "howdy, partner!" == "howdy partner!" )', function () {
+			expect( new $._jade.main().handle_logic( '- if ( "howdy, partner!" == "howdy partner!" )' ) ).toBe( false );
+		} );
+
 		it( 'should be false for: - if ( 4 < 3 )', function () {
 			expect( new $._jade.main().handle_logic( '- if( 4 < 3 )' ) ).toBe( false );
 		} );
