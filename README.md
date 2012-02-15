@@ -4,12 +4,20 @@ jadeDom is a [jQuery](http://www.jquery.com/) plugin to help render DOM elements
 
 ## Examples
 
+### HTML
+
+```html
+<div class="class_name">
+  <a href="#" title="Some title" class="inner_class">Some text</a>
+</div>
+```
+
 ### HTML as a String
 
 ```javascript
 $('#wrapper').append( [
   '<div class="class_name">',
-    '<a href="#" title="Some title" class="inner_class">Some text</div>',
+    '<a href="#" title="Some title" class="inner_class">Some text</a>',
   '</div>'
 ].join( '' ) );
 $('#wrapper .class_name' ).click( function () { alert('hi'); } );
