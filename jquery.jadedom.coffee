@@ -92,7 +92,7 @@ class JadeDom
       when '<'          then return left <  right
       when '<='         then return left <= right
   remove_undefined: ( parts ) ->
-    for part, i in parts
+    for i in [ parts.length - 1 .. 0 ]
       parts.splice i, 1 if not parts[ i ]?
   get_var: ( str ) ->
     str = $.trim str
