@@ -1,19 +1,19 @@
 
 'use strict'
 
-get_property = ( obj, namespace, not_found_value ) ->
-  not_found_value ?= false
+get_property = ( obj, namespace, not_found_value = false ) ->
   return not_found_value if not obj?
-  return if obj[ namespace ]? then obj[ namespace ] else not_found_value
+  if namespace.indexOf( '.' ) < 0
+    return if obj[ namespace ]? then obj[ namespace ] else not_found_value
   namespace_array = namespace.split '.'
   val = obj
-  for i in namespace_array
-    val = val[ namespace_array[ i ] ]
+  for key in namespace_array
+    val = val[ key ]
     return not_found_value if not val?
   return if val? then val else not_found_value
 
 class JadeDom
-  constructor: ( @lookup_table, @locals = @locals, @root = document.createDocumentFragment() ) ->
+  constructor: ( @lookup_table = {}, @locals = @locals, @root = document.createDocumentFragment() ) ->
     @show_lookup = false if not @lookup_table?
     @logic = 'none'
     @last_logic = 'none'
@@ -33,13 +33,13 @@ class JadeDom
     $elem = $ elem
     for key, val of obj
       switch key
-        when 'cache' then @cacke_lookup val, $elem
+        when 'cache' then @cache_lookup val, $elem
         else
           if $elem[ key ] then $elem[ key ] val
           else $elem.attr( key, val )
   cache_lookup: ( key, $elem ) ->
     keys = key.split ' '
-    for val, key in keys
+    for key in keys
       @lookup_table[ key ] = if @lookup_table[ key ] then @lookup_table[ key ].add( $elem ) else $elem
   get_type: ( arg, i ) ->
     return 'children' if arg instanceof Array
@@ -53,14 +53,12 @@ class JadeDom
     last_elem = @root
     for child, i in children
       type = @get_type child, i
-      console.log type, child, i
       switch type
         when 'locals'   then @locals = child
         when 'node'     then @root.appendChild last_elem = @get_node child
         when 'logic'    then @handle_logic child
-        when 'children' then @add_children ( if @logic == 'none' then @root else last_elem ), child
+        when 'children' then @add_children ( if @logic != 'none' then @root else last_elem ), child
         when 'options'  then @handle_object last_elem, child
-      console.log 'switch completed'
   add_children: ( elem, children ) ->
     return false if not children.length
     if not @logic
@@ -117,7 +115,6 @@ class JadeDom
     for key, val of attrs
       @set_attribute elem, key, val
   set_attribute: ( elem, key, value ) ->
-    console.log 'setting attribute', key, value
     switch key
       when 'class', 'className' then elem.className = value
       when 'style' then elem.style.cssText = value
@@ -152,14 +149,11 @@ class JadeParser
       @create_element()
       @cache[ @str ] = @elem.cloneNode true if !@skip_cache
   create_element: ->
-    console.log 'creating element'
     @elem = document.createElement( @tag || 'div' )
     @elem.id = @id if @id
     @elem.className = @classes.join ' ' if @classes.length
     @parent.set_attributes( @elem, @attrs ) if @attrs
-    console.log 'finished setting attributes'
     @elem.innerHTML = @html if @html[ 0 ]
-    console.log 'finished creating element'
   escape_html: ( str ) ->
     str.toString().replace( /&/g, '&ampl;' ).replace( />/g, '&gt;' ).replace( /</g, '&lt;' ).replace( /"/g, '&quot;' )
   get_content: ( str ) ->
@@ -215,7 +209,6 @@ class JadeParser
       @jump_to_next @tag.length
     'text_variable': ->
       key = $.trim @str.substring( @cur, @len )
-      console.log key
       @html = @escape_html( @parent.locals[ key ] || @parent.globals[ key ] || key )
       @mode = true
       @str = false
