@@ -113,7 +113,7 @@ class JadeDom
       when 'true' then return true
       when 'false' then return false
       else
-        return +str if str == parseFloat str
+        return parseFloat( str ) if str == parseFloat( str ).toString()
         return str.substring 1, str.length - 1 if str.toString().charAt( 0 ) == '"' or str.toString().charAt( 0 ) == '\''
         @get_property str
   
@@ -280,16 +280,10 @@ class JadeParser
     @replace @parent.globals
     @len = @str.length - 1
 
-$.jade = ->
-  new JadeDom().init Array( arguments... )
+$.jade = ->                     new JadeDom().init Array( arguments... )
+$.jade.set_globals = ( obj ) -> JadeDom.prototype.globals = obj
+$.jade.add_globals = ( obj ) -> $.extend JadeDom.prototype.globals, obj
+$.jade.clear_globals = ->       JadeDom.prototype.globals = {}
 
-$.jade.set_globals = ( obj ) ->
-  JadeDom.prototype.globals = obj
-
-$.jade.add_globals = ( obj ) ->
-  $.extend JadeDom.prototype.globals, obj
-
-$.jade.clear_globals = ->
-  JadeDom.prototype.globals = {}
-
+# $._jade provides access to the root objects for unit testing and debugging
 $._jade = main: JadeDom, parser: JadeParser

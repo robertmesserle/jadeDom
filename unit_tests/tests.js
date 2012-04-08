@@ -772,28 +772,6 @@ require( [ 'cs!../jquery.jadedom', 'jasmine-html' ], function () {
           } );
         } );
 
-        describe( 'if ( 1 === "1" )', function () {
-
-          var $elem = $.jade(
-            'div.wrapper', [
-              'div.foo',
-              '- if ( 1 === "1" )', [
-                'div.bar'
-              ],
-              'div.baz'
-            ]
-          );
-
-          it( 'should have 3 children', function () {
-            expect( $elem.children().length ).toBe( 2 );
-          } );
-          it( 'should have div.foo and div.baz', function () {
-            expect( $elem.children( 'div.foo' ).length ).toBe( 1 );
-            expect( $elem.children( 'div.bar' ).length ).toBe( 0 );
-            expect( $elem.children( 'div.baz' ).length ).toBe( 1 );
-          } );
-        } );
-
         describe( 'if ( 1 >= 1 )', function () {
 
           var $elem = $.jade(
@@ -1071,10 +1049,6 @@ require( [ 'cs!../jquery.jadedom', 'jasmine-html' ], function () {
 
       it( 'should be false for: - if ( false )', function () {
         expect( new $._jade.main().handle_logic( '- if( false )' ) ).toBe( false );
-      } );
-
-      it( 'should be true for: - if ( true == 1 )', function () {
-        expect( new $._jade.main().handle_logic( '- if( true == 1 )' ) ).toBe( true );
       } );
 
       it( 'should be true for: - if ( 4 > 3 )', function () {
