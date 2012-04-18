@@ -58,7 +58,7 @@
         key = keys[ i ];
         this.lookup_table[ key ] = this.lookup_table[ key ]
           ? this.lookup_table[ key ].add( $elem )
-          : $elem
+          : $elem;
       }
     },
     get_type: function ( arg, i ) {
