@@ -96,12 +96,14 @@ class JadeDom
     left = @get_var parts[ 0 ]
     right = @get_var( parts[ 1 ].replace parts[ 3 ], '' )
     switch parts[ 3 ]
-      when '==', '==='  then return left == right
-      when '!==', '!='  then return left != right
-      when '>'          then return left >  right
-      when '>='         then return left >= right
-      when '<'          then return left <  right
-      when '<='         then return left <= right
+      when '=='  then return `left ==  right`
+      when '===' then return `left === right`
+      when '!='  then return `left !=  right`
+      when '!==' then return `left !== right`
+      when '>'   then return `left >   right`
+      when '>='  then return `left >=  right`
+      when '<'   then return `left <   right`
+      when '<='  then return `left <=  right`
   
   remove_undefined: ( parts ) ->
     for i in [ parts.length - 1 .. 0 ]
